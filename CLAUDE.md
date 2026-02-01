@@ -21,7 +21,15 @@ npm run dev
 ```
 src/
 ├── types/index.ts      # TypeScript типы
-├── store/useStore.ts   # Zustand store с persistence
+├── store/
+│   ├── useStore.ts         # Zustand store с persistence
+│   └── useLanguageStore.ts # Store для языка + хуки useT, useDescriptions
+├── i18n/
+│   ├── index.ts            # Экспорт переводов и утилит
+│   ├── types.ts            # Типы локализации
+│   └── translations/
+│       ├── en.ts           # Английский перевод
+│       └── ru.ts           # Русский перевод
 ├── data/
 │   ├── descriptions.ts # Тексты описаний осей и стадий
 │   ├── labels.ts       # Лейблы UI
@@ -42,13 +50,15 @@ src/
 │   │   ├── Connection.tsx        # Линия связи
 │   │   └── CharacterTrajectory.tsx # Траектория персонажа
 │   ├── UI/
-│   │   ├── CharacterList.tsx   # Список персонажей
-│   │   ├── CharacterCard.tsx   # Карточка персонажа
-│   │   ├── CharacterEditor.tsx # Редактор персонажа
-│   │   ├── PointEditor.tsx     # Редактор точки
-│   │   ├── VectorSliders.tsx   # Слайдеры координат
-│   │   ├── StageSelector.tsx   # Выбор стадии
-│   │   └── HistoryView.tsx     # Просмотр истории
+│   │   ├── CharacterList.tsx     # Список персонажей
+│   │   ├── CharacterCard.tsx     # Карточка персонажа
+│   │   ├── CharacterEditor.tsx   # Редактор персонажа
+│   │   ├── PointEditor.tsx       # Редактор точки
+│   │   ├── ConnectionEditor.tsx  # Редактор связей
+│   │   ├── VectorSliders.tsx     # Слайдеры координат
+│   │   ├── StageSelector.tsx     # Выбор стадии
+│   │   ├── HistoryView.tsx       # Просмотр истории
+│   │   └── LanguageSelector.tsx  # Переключатель языка
 │   └── Modals/
 │       ├── PointDetailModal.tsx # Детали точки
 │       └── PathDetailModal.tsx  # Путь к точке
@@ -143,6 +153,25 @@ exportCharacter(id) → Character | null
 ```
 
 Данные сохраняются в localStorage (`despair-space-storage`), версия 2.
+
+## Локализация (i18n)
+
+Поддерживаемые языки: `en`, `ru`
+
+```typescript
+// Хуки для получения переводов
+import { useT, useDescriptions } from './store/useLanguageStore';
+
+const t = useT();           // строки UI (t.sidebar.characters, t.buttons.save, ...)
+const desc = useDescriptions(); // описания осей и стадий
+
+// Переключение языка
+import { useLanguageStore } from './store/useLanguageStore';
+const setLanguage = useLanguageStore((s) => s.setLanguage);
+setLanguage('ru');
+```
+
+Язык сохраняется в localStorage (`despair-space-language`).
 
 ## Команды
 

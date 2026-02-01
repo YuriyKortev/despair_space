@@ -178,9 +178,10 @@ export const DetailPanel: React.FC = () => {
           </svg>
           {t.points.addPoint}
         </button>
-        <p className="text-xs text-slate-500 text-center">
-          {t.shortcuts.shiftClickToConnect}
-        </p>
+        <div className="text-xs text-slate-500 text-center space-y-0.5">
+          <p>{t.shortcuts.doubleClickForPath}</p>
+          <p>{t.shortcuts.shiftClickToConnect}</p>
+        </div>
       </div>
     </div>
   );

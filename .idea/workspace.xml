@@ -4,23 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="Updated PathDetailModal for improved trajectory and axis descriptions.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Layout/DetailPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/DetailPanel.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Layout/MainLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/MainLayout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Layout/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/Sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Modals/PathDetailModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Modals/PathDetailModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Modals/PointDetailModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Modals/PointDetailModal.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/Scene3D/Axes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Scene3D/Axes.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/CharacterCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/CharacterCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/CharacterEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/CharacterEditor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/CharacterList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/CharacterList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/HistoryView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/HistoryView.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/PointEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/PointEditor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/StageSelector.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/StageSelector.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/UI/VectorSliders.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/VectorSliders.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data/labels.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/labels.ts" afterDir="false" />
-    </list>
+    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="added localization" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -140,7 +124,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769951601587</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="added localization">
+      <option name="closed" value="true" />
+      <created>1769957902419</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1769957902419</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -150,7 +142,8 @@
     <MESSAGE value="added copy prompt buttn" />
     <MESSAGE value="added hide character button" />
     <MESSAGE value="Updated PathDetailModal for improved trajectory and axis descriptions." />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated PathDetailModal for improved trajectory and axis descriptions." />
+    <MESSAGE value="added localization" />
+    <option name="LAST_COMMIT_MESSAGE" value="added localization" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
