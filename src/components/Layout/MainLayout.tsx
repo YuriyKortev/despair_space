@@ -3,11 +3,13 @@ import { DetailPanel } from './DetailPanel';
 import { DespairSpace } from '../Scene3D/DespairSpace';
 import { PointDetailModal } from '../Modals/PointDetailModal';
 import { PathDetailModal } from '../Modals/PathDetailModal';
+import { ConnectionEditor } from '../UI/ConnectionEditor';
 import { useStore } from '../../store/useStore';
 
 export const MainLayout: React.FC = () => {
   const showPointDetail = useStore((state) => state.showPointDetail);
   const showPathDetail = useStore((state) => state.showPathDetail);
+  const editingConnectionId = useStore((state) => state.editingConnectionId);
 
   return (
     <div className="w-full h-screen flex bg-slate-950">
@@ -15,7 +17,7 @@ export const MainLayout: React.FC = () => {
       <Sidebar />
 
       {/* Центр — 3D сцена */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden z-0">
         <DespairSpace />
 
         {/* Подсказки по управлению */}
@@ -26,7 +28,7 @@ export const MainLayout: React.FC = () => {
           <div>Клик на точке — выбор</div>
           <div>Двойной клик — детали</div>
           <div>Shift+клик точки — соединить</div>
-          <div>Shift+клик связи — удалить</div>
+          <div>Клик на связи — редактировать</div>
         </div>
       </div>
 
@@ -36,6 +38,7 @@ export const MainLayout: React.FC = () => {
       {/* Модалки */}
       {showPointDetail && <PointDetailModal />}
       {showPathDetail && <PathDetailModal />}
+      {editingConnectionId && <ConnectionEditor />}
     </div>
   );
 };

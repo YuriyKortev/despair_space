@@ -154,6 +154,7 @@ export interface AppState {
   editingCharacterId: string | null;
   showPathDetail: boolean;
   pathDetailPointId: string | null;
+  editingConnectionId: string | null;
 }
 
 export interface AppActions {
@@ -169,6 +170,7 @@ export interface AppActions {
 
   // Связи
   connectPoints: (characterId: string, fromId: string, toId: string, type: TransitionType, crisis?: Connection['crisis']) => void;
+  updateConnection: (characterId: string, connectionId: string, updates: Partial<Omit<Connection, 'id' | 'fromPointId' | 'toPointId'>>) => void;
   deleteConnection: (characterId: string, connectionId: string) => void;
 
   // Выбор
@@ -190,6 +192,8 @@ export interface AppActions {
   closeCharacterEditor: () => void;
   openPathDetail: (pointId: string) => void;
   closePathDetail: () => void;
+  openConnectionEditor: (connectionId: string) => void;
+  closeConnectionEditor: () => void;
 
   // Import/Export
   importCharacter: (character: Character) => void;

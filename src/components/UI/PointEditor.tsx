@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useStore, useCharacterById } from '../../store/useStore';
 import { VectorSliders } from './VectorSliders';
 import { StageSelector } from './StageSelector';
@@ -129,6 +129,9 @@ export const PointEditor: React.FC<PointEditorProps> = ({
     }
   }, [existingPoint]);
 
+  // Трекинг предыдущих подтипов для детекции изменений
+  const prevAxisSubtypesRef = useRef<string>('{}');
+
   // Автогенерация лейбла и описания
   useEffect(() => {
     const tempPoint: DespairPoint = {
@@ -147,6 +150,27 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       setDescription(generateDescription(tempPoint));
     }
   }, [vector, stage, stageSubtype, axisSubtypes, useAutoLabel, useAutoDescription]);
+
+  // При изменении подтипов осей принудительно обновляем описание
+  useEffect(() => {
+    const currentStr = JSON.stringify(axisSubtypes);
+    const hasSubtypes = Object.keys(axisSubtypes).length > 0;
+
+    if (hasSubtypes && currentStr !== prevAxisSubtypesRef.current) {
+      const tempPoint: DespairPoint = {
+        id: 'temp',
+        vector,
+        stage,
+        stageSubtype,
+        axisSubtypes,
+        label: '',
+      };
+      setDescription(generateDescription(tempPoint));
+      setUseAutoDescription(true);
+    }
+
+    prevAxisSubtypesRef.current = currentStr;
+  }, [axisSubtypes, vector, stage, stageSubtype]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

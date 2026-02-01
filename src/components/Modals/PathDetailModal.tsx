@@ -7,6 +7,7 @@ import { findPathFromRoot, findConnection } from '../../utils/graphUtils';
 export const PathDetailModal: React.FC = () => {
   const closePathDetail = useStore((state) => state.closePathDetail);
   const pathDetailPointId = useStore((state) => state.pathDetailPointId);
+  const openConnectionEditor = useStore((state) => state.openConnectionEditor);
   const character = useSelectedCharacter();
 
   if (!character || !pathDetailPointId) return null;
@@ -142,8 +143,10 @@ export const PathDetailModal: React.FC = () => {
                 {connection && (
                   <div className="flex items-center gap-2 py-2 px-4">
                     <div className="flex-1 h-px bg-slate-700" />
-                    <div
-                      className="flex items-center gap-1 text-xs px-2 py-1 rounded"
+                    <button
+                      type="button"
+                      onClick={() => openConnectionEditor(connection.id)}
+                      className="flex items-center gap-1 text-xs px-2 py-1 rounded cursor-pointer hover:opacity-80 transition-opacity"
                       style={{
                         backgroundColor:
                           connection.transitionType === 'crisis'
@@ -158,6 +161,7 @@ export const PathDetailModal: React.FC = () => {
                             ? '#fb923c'
                             : '#94a3b8',
                       }}
+                      title="Редактировать связь"
                     >
                       <svg
                         className="w-3 h-3"
@@ -178,7 +182,20 @@ export const PathDetailModal: React.FC = () => {
                           — {connection.crisis.trigger}
                         </span>
                       )}
-                    </div>
+                      <svg
+                        className="w-3 h-3 ml-1 opacity-50"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                        />
+                      </svg>
+                    </button>
                     <div className="flex-1 h-px bg-slate-700" />
                   </div>
                 )}

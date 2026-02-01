@@ -132,6 +132,7 @@ export const DespairPoint: React.FC<DespairPointProps> = ({
         <Html
           position={[0, -size - 0.03, 0]}
           center
+          zIndexRange={[1, 10]}
           style={{
             pointerEvents: 'none',
             userSelect: 'none',

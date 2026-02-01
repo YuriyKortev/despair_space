@@ -84,6 +84,7 @@ const initialState = {
   editingCharacterId: null,
   showPathDetail: false,
   pathDetailPointId: null,
+  editingConnectionId: null,
 };
 
 export const useStore = create<Store>()(
@@ -220,6 +221,20 @@ export const useStore = create<Store>()(
         }));
       },
 
+      updateConnection: (characterId, connectionId, updates) => {
+        set((state) => ({
+          characters: state.characters.map((c) => {
+            if (c.id !== characterId) return c;
+            return {
+              ...c,
+              connections: c.connections.map((conn) =>
+                conn.id === connectionId ? { ...conn, ...updates } : conn
+              ),
+            };
+          }),
+        }));
+      },
+
       deleteConnection: (characterId, connectionId) => {
         set((state) => ({
           characters: state.characters.map((c) => {
@@ -317,6 +332,14 @@ export const useStore = create<Store>()(
           showPathDetail: false,
           pathDetailPointId: null,
         });
+      },
+
+      openConnectionEditor: (connectionId) => {
+        set({ editingConnectionId: connectionId });
+      },
+
+      closeConnectionEditor: () => {
+        set({ editingConnectionId: null });
       },
 
       // ===== IMPORT/EXPORT =====

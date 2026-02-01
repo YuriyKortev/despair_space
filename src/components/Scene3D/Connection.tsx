@@ -19,8 +19,7 @@ export const Connection: React.FC<ConnectionProps> = ({
   toPoint,
   isCharacterSelected,
 }) => {
-  const selectedCharacterId = useStore((state) => state.selectedCharacterId);
-  const deleteConnection = useStore((state) => state.deleteConnection);
+  const openConnectionEditor = useStore((state) => state.openConnectionEditor);
 
   const color = getConnectionColor(connection.transitionType);
   const opacity = isCharacterSelected ? 0.8 : 0.3;
@@ -74,11 +73,11 @@ export const Connection: React.FC<ConnectionProps> = ({
   // Линия с дополнительной толщиной для кризиса
   const lineWidth = connection.transitionType === 'crisis' ? 3 : 2;
 
-  // Обработчик клика для удаления связи
+  // Обработчик клика для редактирования связи
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    if (e.nativeEvent.shiftKey && selectedCharacterId && isCharacterSelected) {
-      deleteConnection(selectedCharacterId, connection.id);
+    if (isCharacterSelected) {
+      openConnectionEditor(connection.id);
     }
   };
 
