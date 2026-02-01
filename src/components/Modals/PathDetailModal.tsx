@@ -7,6 +7,17 @@ import { findPathFromRoot, findConnection } from '../../utils/graphUtils';
 import type { Character, DespairPoint } from '../../types';
 
 /**
+ * Описывает позицию на оси словами
+ */
+function describeAxisPosition(value: number, lowLabel: string, highLabel: string): string {
+  if (value < 0.2) return `глубоко в ${lowLabel}`;
+  if (value < 0.4) return `склоняется к ${lowLabel}`;
+  if (value < 0.6) return `между ${lowLabel} и ${highLabel}`;
+  if (value < 0.8) return `склоняется к ${highLabel}`;
+  return `глубоко в ${highLabel}`;
+}
+
+/**
  * Генерирует промпт для LLM с beat sheet синопсисом и феноменологией от лица персонажа
  */
 function generateLLMPrompt(character: Character, path: DespairPoint[]): string {
@@ -27,43 +38,33 @@ function generateLLMPrompt(character: Character, path: DespairPoint[]): string {
   if (hasCore) {
     lines.push(`### Ядро персонажа`);
     if (character.core.history.length > 0) {
-      lines.push(`- **История:** ${character.core.history.join('; ')}`);
+      lines.push(`- **Ключевые события прошлого:** ${character.core.history.join('; ')}`);
     }
     if (character.core.body) {
-      lines.push(`- **Тело:** ${character.core.body}`);
+      lines.push(`- **Физическое описание:** ${character.core.body}`);
     }
     if (character.core.gift) {
-      lines.push(`- **Дар:** ${character.core.gift}`);
+      lines.push(`- **Талант/способность:** ${character.core.gift}`);
     }
     lines.push(``);
   }
 
-  // Контекст осей
-  lines.push(`### Оси пространства отчаяния (значения 0.0–1.0)`);
-  lines.push(`- **finiteInfinite:** 0 = Конечное (потеря себя в мире), 1 = Бесконечное (потеря мира в себе)`);
-  lines.push(`- **necessityPossibility:** 0 = Необходимость (детерминизм), 1 = Возможность (паралич выбора)`);
-  lines.push(`- **consciousness:** 0 = Неведение, 1 = Полная осознанность`);
+  // Контекст модели Кьеркегора
+  lines.push(`### Контекст: Модель отчаяния Сёрена Кьеркегора`);
   lines.push(``);
-
-  // Подтипы осей
-  lines.push(`### Подтипы осей`);
-  lines.push(`**Бесконечное (>0.6):** imagination, cognition, feeling, will`);
-  lines.push(`**Конечное (<0.4):** conformist, prudent`);
-  lines.push(`**Возможность (>0.6):** combinatorial, paralyzed`);
-  lines.push(`**Необходимость (<0.4):** fatalist, determinist`);
-  lines.push(`**Осознанность (>0.6):** suffering, defiant`);
-  lines.push(`**Неведение (<0.4):** naive, busy, denial`);
+  lines.push(`Пространство отчаяния имеет три оси (значения от 0% до 100%):`);
+  lines.push(`- **Конечное ↔ Бесконечное:** Конечное — потеря себя в мирском, приспособленчество. Бесконечное — потеря мира в себе, уход в фантазии и абстракции.`);
+  lines.push(`- **Необходимость ↔ Возможность:** Необходимость — детерминизм, фатализм. Возможность — паралич от избытка вариантов.`);
+  lines.push(`- **Неведение ↔ Осознанность:** Неведение — не знает о своём отчаянии. Осознанность — остро переживает своё состояние.`);
   lines.push(``);
-
-  // Стадии
-  lines.push(`### Стадии существования`);
-  lines.push(`- **aesthetic:** Эстетическая (sensual, romantic, intellectual)`);
-  lines.push(`- **ethical:** Этическая (civic, heroic)`);
-  lines.push(`- **religious:** Религиозная (immanent, paradoxical)`);
+  lines.push(`Стадии существования:`);
+  lines.push(`- **Эстетическая** — жизнь моментом, погоня за впечатлениями, избегание выбора`);
+  lines.push(`- **Этическая** — жизнь долгом, принятие ответственности, постоянство`);
+  lines.push(`- **Религиозная** — жизнь перед Богом, прыжок веры через абсурд`);
   lines.push(``);
 
   // Траектория
-  lines.push(`## Траектория (${path.length} точек)`);
+  lines.push(`## Траектория персонажа (${path.length} ${path.length === 1 ? 'состояние' : path.length < 5 ? 'состояния' : 'состояний'})`);
   lines.push(``);
 
   path.forEach((point, index) => {
@@ -75,39 +76,69 @@ function generateLLMPrompt(character: Character, path: DespairPoint[]): string {
 
     lines.push(`### ${index + 1}. ${point.label}`);
     if (point.momentName) {
-      lines.push(`**Момент:** ${point.momentName}`);
+      lines.push(`**Момент в сюжете:** ${point.momentName}`);
     }
-    lines.push(`**Вектор:** [${v.finiteInfinite.toFixed(2)}, ${v.necessityPossibility.toFixed(2)}, ${v.consciousness.toFixed(2)}]`);
-    lines.push(`**Стадия:** ${point.stage}${point.stageSubtype ? ` (${point.stageSubtype})` : ''}`);
+    lines.push(``);
 
-    // Подтипы осей если заданы
+    // Человеческое описание позиции в пространстве
+    lines.push(`**Положение в пространстве отчаяния:**`);
+    lines.push(`- ${describeAxisPosition(v.finiteInfinite, 'Конечном', 'Бесконечном')} (${Math.round(v.finiteInfinite * 100)}%)`);
+    lines.push(`- ${describeAxisPosition(v.necessityPossibility, 'Необходимости', 'Возможности')} (${Math.round(v.necessityPossibility * 100)}%)`);
+    lines.push(`- ${describeAxisPosition(v.consciousness, 'Неведении', 'Осознанности')} (${Math.round(v.consciousness * 100)}%)`);
+
+    // Стадия с подтипом
+    const stageName = STAGE_NAMES[point.stage];
+    const subtypeName = point.stageSubtype ? SUBTYPE_NAMES[point.stageSubtype] : null;
+    lines.push(`**Стадия существования:** ${stageName}${subtypeName ? ` (${subtypeName})` : ''}`);
+
+    // Подтипы осей если заданы — с человеческими названиями
     if (point.axisSubtypes) {
       const subtypes: string[] = [];
-      if (point.axisSubtypes.infinityType) subtypes.push(`infinity:${point.axisSubtypes.infinityType}`);
-      if (point.axisSubtypes.finitudeType) subtypes.push(`finitude:${point.axisSubtypes.finitudeType}`);
-      if (point.axisSubtypes.possibilityType) subtypes.push(`possibility:${point.axisSubtypes.possibilityType}`);
-      if (point.axisSubtypes.necessityType) subtypes.push(`necessity:${point.axisSubtypes.necessityType}`);
-      if (point.axisSubtypes.awarenessType) subtypes.push(`awareness:${point.axisSubtypes.awarenessType}`);
-      if (point.axisSubtypes.unawarenessType) subtypes.push(`unawareness:${point.axisSubtypes.unawarenessType}`);
+      if (point.axisSubtypes.infinityType) {
+        subtypes.push(`Бесконечное: ${SUBTYPE_NAMES[point.axisSubtypes.infinityType]}`);
+      }
+      if (point.axisSubtypes.finitudeType) {
+        subtypes.push(`Конечное: ${SUBTYPE_NAMES[point.axisSubtypes.finitudeType]}`);
+      }
+      if (point.axisSubtypes.possibilityType) {
+        subtypes.push(`Возможность: ${SUBTYPE_NAMES[point.axisSubtypes.possibilityType]}`);
+      }
+      if (point.axisSubtypes.necessityType) {
+        subtypes.push(`Необходимость: ${SUBTYPE_NAMES[point.axisSubtypes.necessityType]}`);
+      }
+      if (point.axisSubtypes.awarenessType) {
+        subtypes.push(`Осознанность: ${SUBTYPE_NAMES[point.axisSubtypes.awarenessType]}`);
+      }
+      if (point.axisSubtypes.unawarenessType) {
+        subtypes.push(`Неведение: ${SUBTYPE_NAMES[point.axisSubtypes.unawarenessType]}`);
+      }
       if (subtypes.length > 0) {
-        lines.push(`**Подтипы осей:** ${subtypes.join(', ')}`);
+        lines.push(`**Характер состояния:** ${subtypes.join('; ')}`);
       }
     }
 
     if (point.description) {
-      lines.push(`**Описание:** ${point.description}`);
+      lines.push(`**Авторское описание:** ${point.description}`);
     }
 
     // Связь к следующей точке
     if (conn) {
-      let transitionLine = `→ **Переход:** ${conn.transitionType}`;
-      if (conn.crisis?.trigger) {
-        transitionLine += ` — триггер: "${conn.crisis.trigger}"`;
+      lines.push(``);
+      const transitionName = TRANSITION_NAMES[conn.transitionType];
+      if (conn.transitionType === 'crisis') {
+        let crisisLine = `↓ **${transitionName}**`;
+        if (conn.crisis?.trigger) {
+          crisisLine += `: ${conn.crisis.trigger}`;
+        }
+        lines.push(crisisLine);
+        if (conn.crisis?.alternatives && conn.crisis.alternatives.length > 0) {
+          lines.push(`  _Альтернативные пути: ${conn.crisis.alternatives.join(', ')}_`);
+        }
+      } else if (conn.transitionType === 'branch') {
+        lines.push(`↓ **${transitionName}** (альтернативное развитие)`);
+      } else {
+        lines.push(`↓ **${transitionName}** (постепенное изменение)`);
       }
-      if (conn.crisis?.alternatives && conn.crisis.alternatives.length > 0) {
-        transitionLine += ` (альтернативы: ${conn.crisis.alternatives.join(', ')})`;
-      }
-      lines.push(transitionLine);
     }
 
     lines.push(``);
@@ -116,8 +147,12 @@ function generateLLMPrompt(character: Character, path: DespairPoint[]): string {
   // Инструкция
   lines.push(`---`);
   lines.push(`## Что нужно сгенерировать:`);
-  lines.push(`1. **Beat Sheet синопсис** — структурированное описание ключевых битов траектории`);
-  lines.push(`2. **Феноменология от лица персонажа** — одно развёрнутое переживание центрального события от первого лица (внутренний монолог, ощущения, восприятие)`);
+  lines.push(``);
+  lines.push(`### 1. Beat Sheet синопсис`);
+  lines.push(`Структурированное описание ключевых битов траектории: завязка, нарастание, кульминация, развязка. Опирайся на положение персонажа в пространстве отчаяния и переходы между состояниями.`);
+  lines.push(``);
+  lines.push(`### 2. Феноменология от лица персонажа`);
+  lines.push(`Одно развёрнутое переживание центрального события от первого лица. Это должен быть внутренний монолог: что персонаж чувствует, как воспринимает мир, какие телесные ощущения испытывает. Передай его уникальный способ быть в мире, исходя из его положения на осях отчаяния.`);
 
   return lines.join('\n');
 }

@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="Refine auto-generation logic in PointEditor&#10;&#10;- Disable auto-generated labels and descriptions when editing existing points.&#10;- Ensure initialization flags handle editing state correctly.&#10;- Preserve user-modified descriptions, discarding auto-generated ones.">
+    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="added hide character button">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/Modals/PathDetailModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Modals/PathDetailModal.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -101,14 +102,32 @@
       <option name="project" value="LOCAL" />
       <updated>1769910076768</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="added copy prompt buttn">
+      <option name="closed" value="true" />
+      <created>1769910340160</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1769910340160</updated>
+    </task>
+    <task id="LOCAL-00006" summary="added hide character button">
+      <option name="closed" value="true" />
+      <created>1769911808031</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1769911808031</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fixes" />
     <MESSAGE value="Add tooltips to vector sliders, implement connection editing functionality&#10;&#10;- Introduced `AxisTooltip` component for displaying detailed descriptions of vector axes.&#10;- Enabled editing of connections via an `openConnectionEditor` modal triggered by clicking a connection.&#10;- Updated descriptions and styles in `CLAUDE.md` for clarity about core features and architecture.&#10;- Modified store to support connection editing (`editingConnectionId`, `updateConnection`).&#10;- Adjusted PathDetailModal and connection behavior for consistency." />
     <MESSAGE value="Refine auto-generation logic in PointEditor&#10;&#10;- Disable auto-generated labels and descriptions when editing existing points.&#10;- Ensure initialization flags handle editing state correctly.&#10;- Preserve user-modified descriptions, discarding auto-generated ones." />
-    <option name="LAST_COMMIT_MESSAGE" value="Refine auto-generation logic in PointEditor&#10;&#10;- Disable auto-generated labels and descriptions when editing existing points.&#10;- Ensure initialization flags handle editing state correctly.&#10;- Preserve user-modified descriptions, discarding auto-generated ones." />
+    <MESSAGE value="added copy prompt buttn" />
+    <MESSAGE value="added hide character button" />
+    <option name="LAST_COMMIT_MESSAGE" value="added hide character button" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
