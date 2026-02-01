@@ -109,8 +109,12 @@ export const PointEditor: React.FC<PointEditorProps> = ({
   const [momentName, setMomentName] = useState('');
   const [label, setLabel] = useState('');
   const [description, setDescription] = useState('');
-  const [useAutoLabel, setUseAutoLabel] = useState(true);
-  const [useAutoDescription, setUseAutoDescription] = useState(true);
+  // При редактировании сразу отключаем автогенерацию
+  const [useAutoLabel, setUseAutoLabel] = useState(!isEditing);
+  const [useAutoDescription, setUseAutoDescription] = useState(!isEditing);
+
+  // Флаг завершения инициализации при редактировании
+  const isInitializedRef = useRef(!isEditing);
 
   // Определяем какие подтипы осей показывать
   const suggestedAxes = getSuggestedAxisSubtypes(vector);
@@ -126,6 +130,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       setDescription(existingPoint.description || '');
       setUseAutoLabel(false);
       setUseAutoDescription(!existingPoint.description);
+      isInitializedRef.current = true;
     }
   }, [existingPoint]);
 
@@ -134,6 +139,11 @@ export const PointEditor: React.FC<PointEditorProps> = ({
 
   // Автогенерация лейбла и описания
   useEffect(() => {
+    // Пропускаем автогенерацию пока не завершена инициализация при редактировании
+    if (!isInitializedRef.current) {
+      return;
+    }
+
     const tempPoint: DespairPoint = {
       id: 'temp',
       vector,
@@ -204,7 +214,8 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       stageSubtype,
       axisSubtypes: Object.keys(filteredAxisSubtypes).length > 0 ? filteredAxisSubtypes : undefined,
       label,
-      description: description.trim() || undefined,
+      // Сохраняем описание только если пользователь его изменил вручную
+      description: !useAutoDescription && description.trim() ? description.trim() : undefined,
       momentName: momentName.trim() || undefined,
     };
 
