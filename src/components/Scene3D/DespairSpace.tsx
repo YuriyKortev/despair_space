@@ -32,11 +32,20 @@ const Scene: React.FC = () => {
 };
 
 export const DespairSpace: React.FC = () => {
+  const selectPoint = useStore((state) => state.selectPoint);
+  const cancelConnecting = useStore((state) => state.cancelConnecting);
+
+  const handlePointerMissed = () => {
+    selectPoint(null);
+    cancelConnecting();
+  };
+
   return (
     <div className="w-full h-full">
       <Canvas
         style={{ background: COLORS.background }}
         gl={{ antialias: true }}
+        onPointerMissed={handlePointerMissed}
       >
         <PerspectiveCamera
           makeDefault

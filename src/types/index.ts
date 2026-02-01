@@ -5,18 +5,15 @@ export type Stage = 'aesthetic' | 'ethical' | 'religious';
 export type AestheticSubtype =
   | 'sensual'           // чувственный Дон Жуан
   | 'romantic'          // романтик-мечтатель
-  | 'intellectual'      // эстетик-интеллектуал
-  | 'demonic';          // демонический эстетик (подпольный)
+  | 'intellectual';     // эстетик-интеллектуал
 
 export type EthicalSubtype =
-  | 'bourgeois'         // обывательская добропорядочность
-  | 'heroic'            // трагический герой
-  | 'ironic';           // этик с иронией
+  | 'civic'             // гражданственный долг
+  | 'heroic';           // трагический герой
 
 export type ReligiousSubtype =
-  | 'religiousness_a'   // религиозность А (имманентная)
-  | 'religiousness_b'   // религиозность Б (парадоксальная вера)
-  | 'demonic_religious';// демоническое (знает и отвергает)
+  | 'immanent'          // имманентная религиозность
+  | 'paradoxical';      // парадоксальная вера
 
 export type StageSubtype = AestheticSubtype | EthicalSubtype | ReligiousSubtype;
 
@@ -29,18 +26,25 @@ export type InfinitySubtype =
 
 export type FinitudeSubtype =
   | 'conformist'        // делает "как все"
-  | 'narrow_prudence'   // узкое благоразумие
-  | 'lost_self';        // отшлифован как галька
+  | 'prudent';          // узкое благоразумие
 
 export type NecessitySubtype =
-  | 'fatalism'          // всё предопределено
-  | 'philistine'        // обывательская узость
-  | 'determinism';      // научный детерминизм
+  | 'fatalist'          // всё предопределено
+  | 'determinist';      // научный детерминизм
 
 export type PossibilitySubtype =
-  | 'fantasist'         // бесконечные "а вдруг"
-  | 'paralysis'         // паралич от возможностей
-  | 'underground';      // рефлексия до бесконечности
+  | 'combinatorial'     // комбинаторные фантазии
+  | 'paralyzed';        // паралич от возможностей
+
+// Подтипы осознанности
+export type UnawarenessSubtype =
+  | 'naive'             // наивное неведение
+  | 'busy'              // занятость как бегство
+  | 'denial';           // активное отрицание
+
+export type AwarenessSubtype =
+  | 'suffering'         // страдающее осознание
+  | 'defiant';          // дерзкое осознание
 
 // ===== ВЕКТОР В ПРОСТРАНСТВЕ =====
 
@@ -64,15 +68,17 @@ export interface DespairPoint {
 
   // Подтипы осей (определяются автоматически по координатам, можно переопределить)
   axisSubtypes?: {
-    infinityType?: InfinitySubtype;    // если finiteInfinite > 0.6
-    finitudeType?: FinitudeSubtype;    // если finiteInfinite < 0.4
-    necessityType?: NecessitySubtype;  // если necessityPossibility < 0.4
+    infinityType?: InfinitySubtype;       // если finiteInfinite > 0.6
+    finitudeType?: FinitudeSubtype;       // если finiteInfinite < 0.4
+    necessityType?: NecessitySubtype;     // если necessityPossibility < 0.4
     possibilityType?: PossibilitySubtype; // если necessityPossibility > 0.6
+    unawarenessType?: UnawarenessSubtype; // если consciousness < 0.4
+    awarenessType?: AwarenessSubtype;     // если consciousness > 0.6
   };
 
   // Метаданные
   label: string;              // краткий лейбл (под точкой)
-  description: string;        // детальное описание (по клику)
+  description?: string;       // пользовательское описание (опционально)
   momentName?: string;        // название момента в сюжете ("до убийства", "признание")
 
   // Визуал
@@ -146,6 +152,8 @@ export interface AppState {
   editingPointId: string | null;
   showCharacterEditor: boolean;
   editingCharacterId: string | null;
+  showPathDetail: boolean;
+  pathDetailPointId: string | null;
 }
 
 export interface AppActions {
@@ -180,6 +188,8 @@ export interface AppActions {
   closePointEditor: () => void;
   openCharacterEditor: (characterId: string | null) => void;
   closeCharacterEditor: () => void;
+  openPathDetail: (pointId: string) => void;
+  closePathDetail: () => void;
 
   // Import/Export
   importCharacter: (character: Character) => void;

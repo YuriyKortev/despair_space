@@ -99,6 +99,7 @@ export const DespairPoint: React.FC<DespairPointProps> = ({
           color={color}
           transparent
           opacity={opacity}
+          depthWrite={false}
           emissive={isSelected || isConnectSource ? color : '#000000'}
           emissiveIntensity={isSelected ? 0.5 : isConnectSource ? 0.8 : 0}
         />
@@ -112,6 +113,7 @@ export const DespairPoint: React.FC<DespairPointProps> = ({
             color={characterColor}
             transparent
             opacity={0.3}
+            depthWrite={false}
             wireframe
           />
         </mesh>

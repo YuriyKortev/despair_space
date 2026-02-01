@@ -2,10 +2,12 @@ import { Sidebar } from './Sidebar';
 import { DetailPanel } from './DetailPanel';
 import { DespairSpace } from '../Scene3D/DespairSpace';
 import { PointDetailModal } from '../Modals/PointDetailModal';
+import { PathDetailModal } from '../Modals/PathDetailModal';
 import { useStore } from '../../store/useStore';
 
 export const MainLayout: React.FC = () => {
   const showPointDetail = useStore((state) => state.showPointDetail);
+  const showPathDetail = useStore((state) => state.showPathDetail);
 
   return (
     <div className="w-full h-screen flex bg-slate-950">
@@ -13,7 +15,7 @@ export const MainLayout: React.FC = () => {
       <Sidebar />
 
       {/* Центр — 3D сцена */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-hidden">
         <DespairSpace />
 
         {/* Подсказки по управлению */}
@@ -23,7 +25,8 @@ export const MainLayout: React.FC = () => {
           <div>Колёсико — масштаб</div>
           <div>Клик на точке — выбор</div>
           <div>Двойной клик — детали</div>
-          <div>Shift+клик — соединить</div>
+          <div>Shift+клик точки — соединить</div>
+          <div>Shift+клик связи — удалить</div>
         </div>
       </div>
 
@@ -32,6 +35,7 @@ export const MainLayout: React.FC = () => {
 
       {/* Модалки */}
       {showPointDetail && <PointDetailModal />}
+      {showPathDetail && <PathDetailModal />}
     </div>
   );
 };

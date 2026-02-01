@@ -10,9 +10,9 @@ interface StageSelectorProps {
 }
 
 const STAGE_SUBTYPES: Record<Stage, readonly string[]> = {
-  aesthetic: ['sensual', 'romantic', 'intellectual', 'demonic'] as const,
-  ethical: ['bourgeois', 'heroic', 'ironic'] as const,
-  religious: ['religiousness_a', 'religiousness_b', 'demonic_religious'] as const,
+  aesthetic: ['sensual', 'romantic', 'intellectual'] as const,
+  ethical: ['civic', 'heroic'] as const,
+  religious: ['immanent', 'paradoxical'] as const,
 };
 
 export const StageSelector: React.FC<StageSelectorProps> = ({

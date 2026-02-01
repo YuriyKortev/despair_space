@@ -163,9 +163,26 @@ export const generateLabel = (point: DespairPoint): string => {
 
 // ===== ГЕНЕРАЦИЯ ОПИСАНИЙ =====
 
-export const generateDescription = (point: DespairPoint): string => {
+export const generateProceduralDescription = (point: DespairPoint): string => {
   const parts: string[] = [];
   const { finiteInfinite: fi, necessityPossibility: np, consciousness: c } = point.vector;
+
+  // Особый случай: религиозная стадия + высокая осознанность = точка спасения
+  if (point.stage === 'religious' && c > 0.6) {
+    parts.push('🕊️ ТОЧКА СПАСЕНИЯ');
+    parts.push('Религиозная стадия с высокой осознанностью — это не отчаяние, а его преодоление. Здесь человек стоит перед Богом в полной прозрачности, без иллюзий и самообмана.');
+
+    const stageDesc = STAGE_DESCRIPTIONS[point.stage];
+    if (stageDesc) {
+      if (point.stageSubtype && stageDesc.subtypes[point.stageSubtype]) {
+        parts.push(stageDesc.subtypes[point.stageSubtype].full);
+      } else {
+        parts.push(stageDesc.base.full);
+      }
+    }
+
+    return parts.join('\n\n');
+  }
 
   // 1. Описание стадии
   const stageDesc = STAGE_DESCRIPTIONS[point.stage];
@@ -194,17 +211,32 @@ export const generateDescription = (point: DespairPoint): string => {
     if (desc) parts.push(desc.full);
   }
 
-  // 3. Описание осознанности
+  // 3. Описание осознанности (с подтипами)
   if (c < 0.4) {
-    parts.push(ZONE_DESCRIPTIONS.consciousness.unconscious.full);
+    // Неведение
+    if (point.axisSubtypes?.unawarenessType) {
+      const desc = ZONE_DESCRIPTIONS.unawareness[point.axisSubtypes.unawarenessType];
+      if (desc) parts.push(desc.full);
+    } else {
+      parts.push(ZONE_DESCRIPTIONS.consciousness.unconscious.full);
+    }
   } else if (c > 0.6) {
-    parts.push(ZONE_DESCRIPTIONS.consciousness.conscious.full);
+    // Осознанность
+    if (point.axisSubtypes?.awarenessType) {
+      const desc = ZONE_DESCRIPTIONS.awareness[point.axisSubtypes.awarenessType];
+      if (desc) parts.push(desc.full);
+    } else {
+      parts.push(ZONE_DESCRIPTIONS.consciousness.conscious.full);
+    }
   } else {
     parts.push(ZONE_DESCRIPTIONS.consciousness.semiconscious.full);
   }
 
   return parts.join('\n\n');
 };
+
+// Алиас для обратной совместимости
+export const generateDescription = generateProceduralDescription;
 
 // ===== КООРДИНАТЫ В ТЕКСТ =====
 
@@ -221,12 +253,14 @@ export const vectorToText = (vector: DespairVector): string => {
 // ===== ПОЛУЧЕНИЕ ПОДТИПОВ ПО КООРДИНАТАМ =====
 
 export const getSuggestedAxisSubtypes = (vector: DespairVector) => {
-  const { finiteInfinite: fi, necessityPossibility: np } = vector;
+  const { finiteInfinite: fi, necessityPossibility: np, consciousness: c } = vector;
 
   return {
     showInfinity: fi > 0.6,
     showFinitude: fi < 0.4,
     showPossibility: np > 0.6,
     showNecessity: np < 0.4,
+    showUnawareness: c < 0.4,
+    showAwareness: c > 0.6,
   };
 };

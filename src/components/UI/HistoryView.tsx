@@ -11,6 +11,7 @@ interface HistoryViewProps {
 export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
   const selectPoint = useStore((state) => state.selectPoint);
   const openPointEditor = useStore((state) => state.openPointEditor);
+  const openPathDetail = useStore((state) => state.openPathDetail);
   const selectedPointId = useStore((state) => state.selectedPointId);
 
   const tree = buildHistoryTree(
@@ -121,6 +122,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
               {/* Карточка точки */}
               <div
                 onClick={() => selectPoint(point.id)}
+                onDoubleClick={() => openPathDetail(point.id)}
                 className={`
                   p-2 rounded-lg cursor-pointer transition-all group border
                   ${isSelected ? 'bg-slate-700' : 'bg-slate-800/50 hover:bg-slate-800 border-transparent'}

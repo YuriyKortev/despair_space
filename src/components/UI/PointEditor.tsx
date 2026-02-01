@@ -2,8 +2,82 @@ import { useState, useEffect } from 'react';
 import { useStore, useCharacterById } from '../../store/useStore';
 import { VectorSliders } from './VectorSliders';
 import { StageSelector } from './StageSelector';
-import { generateLabel, generateDescription } from '../../data/labels';
-import type { DespairVector, Stage, StageSubtype, DespairPoint } from '../../types';
+import { generateLabel, generateDescription, getSuggestedAxisSubtypes } from '../../data/labels';
+import { ZONE_DESCRIPTIONS, SUBTYPE_NAMES } from '../../data/descriptions';
+import type {
+  DespairVector,
+  Stage,
+  StageSubtype,
+  DespairPoint,
+  InfinitySubtype,
+  FinitudeSubtype,
+  NecessitySubtype,
+  PossibilitySubtype,
+  UnawarenessSubtype,
+  AwarenessSubtype,
+} from '../../types';
+
+interface AxisSubtypes {
+  infinityType?: InfinitySubtype;
+  finitudeType?: FinitudeSubtype;
+  necessityType?: NecessitySubtype;
+  possibilityType?: PossibilitySubtype;
+  unawarenessType?: UnawarenessSubtype;
+  awarenessType?: AwarenessSubtype;
+}
+
+// Компонент для выбора подтипа оси
+interface AxisSubtypeSelectorProps {
+  title: string;
+  subtitle: string;
+  options: string[];
+  value: string | undefined;
+  onChange: (value: string | undefined) => void;
+  descriptions: Record<string, { short: string; full: string }>;
+}
+
+const AxisSubtypeSelector: React.FC<AxisSubtypeSelectorProps> = ({
+  title,
+  subtitle,
+  options,
+  value,
+  onChange,
+  descriptions,
+}) => {
+  return (
+    <div className="p-3 bg-slate-800/50 rounded-lg">
+      <div className="text-xs font-medium text-slate-400 mb-0.5">{title}</div>
+      <div className="text-[10px] text-slate-500 mb-2">{subtitle}</div>
+      <div className="flex flex-wrap gap-1">
+        {options.map((opt) => {
+          const isSelected = value === opt;
+          const desc = descriptions[opt];
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onChange(isSelected ? undefined : opt)}
+              className={`
+                px-2 py-1 rounded text-xs transition-all
+                ${isSelected
+                  ? 'bg-violet-600 text-white'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}
+              `}
+              title={desc?.short}
+            >
+              {SUBTYPE_NAMES[opt] || opt}
+            </button>
+          );
+        })}
+      </div>
+      {value && descriptions[value] && (
+        <div className="text-[10px] text-slate-400 mt-2 italic">
+          {descriptions[value].short}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface PointEditorProps {
   characterId: string | null;
@@ -31,22 +105,27 @@ export const PointEditor: React.FC<PointEditorProps> = ({
   });
   const [stage, setStage] = useState<Stage>('aesthetic');
   const [stageSubtype, setStageSubtype] = useState<StageSubtype | undefined>();
+  const [axisSubtypes, setAxisSubtypes] = useState<AxisSubtypes>({});
   const [momentName, setMomentName] = useState('');
   const [label, setLabel] = useState('');
   const [description, setDescription] = useState('');
   const [useAutoLabel, setUseAutoLabel] = useState(true);
   const [useAutoDescription, setUseAutoDescription] = useState(true);
 
+  // Определяем какие подтипы осей показывать
+  const suggestedAxes = getSuggestedAxisSubtypes(vector);
+
   useEffect(() => {
     if (existingPoint) {
       setVector(existingPoint.vector);
       setStage(existingPoint.stage);
       setStageSubtype(existingPoint.stageSubtype);
+      setAxisSubtypes(existingPoint.axisSubtypes || {});
       setMomentName(existingPoint.momentName || '');
       setLabel(existingPoint.label);
-      setDescription(existingPoint.description);
+      setDescription(existingPoint.description || '');
       setUseAutoLabel(false);
-      setUseAutoDescription(false);
+      setUseAutoDescription(!existingPoint.description);
     }
   }, [existingPoint]);
 
@@ -57,8 +136,8 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       vector,
       stage,
       stageSubtype,
+      axisSubtypes,
       label: '',
-      description: '',
     };
 
     if (useAutoLabel) {
@@ -67,19 +146,41 @@ export const PointEditor: React.FC<PointEditorProps> = ({
     if (useAutoDescription) {
       setDescription(generateDescription(tempPoint));
     }
-  }, [vector, stage, stageSubtype, useAutoLabel, useAutoDescription]);
+  }, [vector, stage, stageSubtype, axisSubtypes, useAutoLabel, useAutoDescription]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!characterId) return;
 
+    // Фильтруем axisSubtypes - оставляем только те, что соответствуют текущим координатам
+    const filteredAxisSubtypes: AxisSubtypes = {};
+    if (suggestedAxes.showInfinity && axisSubtypes.infinityType) {
+      filteredAxisSubtypes.infinityType = axisSubtypes.infinityType;
+    }
+    if (suggestedAxes.showFinitude && axisSubtypes.finitudeType) {
+      filteredAxisSubtypes.finitudeType = axisSubtypes.finitudeType;
+    }
+    if (suggestedAxes.showPossibility && axisSubtypes.possibilityType) {
+      filteredAxisSubtypes.possibilityType = axisSubtypes.possibilityType;
+    }
+    if (suggestedAxes.showNecessity && axisSubtypes.necessityType) {
+      filteredAxisSubtypes.necessityType = axisSubtypes.necessityType;
+    }
+    if (suggestedAxes.showUnawareness && axisSubtypes.unawarenessType) {
+      filteredAxisSubtypes.unawarenessType = axisSubtypes.unawarenessType;
+    }
+    if (suggestedAxes.showAwareness && axisSubtypes.awarenessType) {
+      filteredAxisSubtypes.awarenessType = axisSubtypes.awarenessType;
+    }
+
     const pointData: Omit<DespairPoint, 'id'> = {
       vector,
       stage,
       stageSubtype,
+      axisSubtypes: Object.keys(filteredAxisSubtypes).length > 0 ? filteredAxisSubtypes : undefined,
       label,
-      description,
+      description: description.trim() || undefined,
       momentName: momentName.trim() || undefined,
     };
 
@@ -139,6 +240,99 @@ export const PointEditor: React.FC<PointEditorProps> = ({
         onSubtypeChange={setStageSubtype}
       />
 
+      {/* Подтипы осей (появляются при экстремальных координатах) */}
+      {(suggestedAxes.showInfinity || suggestedAxes.showFinitude ||
+        suggestedAxes.showPossibility || suggestedAxes.showNecessity ||
+        suggestedAxes.showUnawareness || suggestedAxes.showAwareness) && (
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-slate-300">
+            Подтипы отчаяния по осям
+          </label>
+
+          {/* Бесконечность */}
+          {suggestedAxes.showInfinity && (
+            <AxisSubtypeSelector
+              title="Отчаяние бесконечности"
+              subtitle="Координата X > 60%"
+              options={['imagination', 'cognition', 'feeling', 'will'] as InfinitySubtype[]}
+              value={axisSubtypes.infinityType}
+              onChange={(v) => setAxisSubtypes({ ...axisSubtypes, infinityType: v as InfinitySubtype | undefined })}
+              descriptions={ZONE_DESCRIPTIONS.infinite}
+            />
+          )}
+
+          {/* Конечность */}
+          {suggestedAxes.showFinitude && (
+            <AxisSubtypeSelector
+              title="Отчаяние конечности"
+              subtitle="Координата X < 40%"
+              options={['conformist', 'prudent'] as FinitudeSubtype[]}
+              value={axisSubtypes.finitudeType}
+              onChange={(v) => setAxisSubtypes({ ...axisSubtypes, finitudeType: v as FinitudeSubtype | undefined })}
+              descriptions={ZONE_DESCRIPTIONS.finite}
+            />
+          )}
+
+          {/* Возможность */}
+          {suggestedAxes.showPossibility && (
+            <AxisSubtypeSelector
+              title="Отчаяние возможности"
+              subtitle="Координата Y > 60%"
+              options={['combinatorial', 'paralyzed'] as PossibilitySubtype[]}
+              value={axisSubtypes.possibilityType}
+              onChange={(v) => setAxisSubtypes({ ...axisSubtypes, possibilityType: v as PossibilitySubtype | undefined })}
+              descriptions={ZONE_DESCRIPTIONS.possibility}
+            />
+          )}
+
+          {/* Необходимость */}
+          {suggestedAxes.showNecessity && (
+            <AxisSubtypeSelector
+              title="Отчаяние необходимости"
+              subtitle="Координата Y < 40%"
+              options={['fatalist', 'determinist'] as NecessitySubtype[]}
+              value={axisSubtypes.necessityType}
+              onChange={(v) => setAxisSubtypes({ ...axisSubtypes, necessityType: v as NecessitySubtype | undefined })}
+              descriptions={ZONE_DESCRIPTIONS.necessity}
+            />
+          )}
+
+          {/* Неведение */}
+          {suggestedAxes.showUnawareness && (
+            <AxisSubtypeSelector
+              title="Неведение"
+              subtitle="Координата Z < 40%"
+              options={['naive', 'busy', 'denial'] as UnawarenessSubtype[]}
+              value={axisSubtypes.unawarenessType}
+              onChange={(v) => setAxisSubtypes({ ...axisSubtypes, unawarenessType: v as UnawarenessSubtype | undefined })}
+              descriptions={ZONE_DESCRIPTIONS.unawareness}
+            />
+          )}
+
+          {/* Осознанность (но не для religious + high awareness = спасение) */}
+          {suggestedAxes.showAwareness && !(stage === 'religious' && vector.consciousness > 0.6) && (
+            <AxisSubtypeSelector
+              title="Осознанность"
+              subtitle="Координата Z > 60%"
+              options={['suffering', 'defiant'] as AwarenessSubtype[]}
+              value={axisSubtypes.awarenessType}
+              onChange={(v) => setAxisSubtypes({ ...axisSubtypes, awarenessType: v as AwarenessSubtype | undefined })}
+              descriptions={ZONE_DESCRIPTIONS.awareness}
+            />
+          )}
+
+          {/* Точка спасения */}
+          {stage === 'religious' && vector.consciousness > 0.6 && (
+            <div className="p-3 bg-amber-900/20 border border-amber-700/50 rounded-lg">
+              <div className="text-sm text-amber-300 font-medium">🕊️ Точка спасения</div>
+              <div className="text-xs text-amber-400/70 mt-1">
+                Религиозная стадия с высокой осознанностью — это не отчаяние, а его преодоление
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Лейбл */}
       <div>
         <div className="flex items-center justify-between mb-1">
@@ -154,8 +348,8 @@ export const PointEditor: React.FC<PointEditorProps> = ({
                 vector,
                 stage,
                 stageSubtype,
+                axisSubtypes,
                 label: '',
-                description: '',
               };
               setLabel(generateLabel(tempPoint));
             }}
@@ -192,8 +386,8 @@ export const PointEditor: React.FC<PointEditorProps> = ({
                 vector,
                 stage,
                 stageSubtype,
+                axisSubtypes,
                 label: '',
-                description: '',
               };
               setDescription(generateDescription(tempPoint));
             }}
@@ -208,10 +402,9 @@ export const PointEditor: React.FC<PointEditorProps> = ({
             setDescription(e.target.value);
             setUseAutoDescription(false);
           }}
-          placeholder="Подробное описание экзистенциального состояния"
+          placeholder="Пользовательское описание (опционально, процедурное сгенерируется автоматически)"
           rows={6}
           className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
-          required
         />
       </div>
 

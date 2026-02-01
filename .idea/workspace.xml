@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="" />
+    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/components/Modals/PathDetailModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/despair_space.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/despair_space.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Layout/DetailPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/DetailPanel.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Layout/MainLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/MainLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Layout/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/Sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Modals/PointDetailModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Modals/PointDetailModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Scene3D/Axes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Scene3D/Axes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Scene3D/Connection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Scene3D/Connection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Scene3D/DespairPoint.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Scene3D/DespairPoint.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Scene3D/DespairSpace.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Scene3D/DespairSpace.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/HistoryView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/HistoryView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/PointEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/PointEditor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/StageSelector.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/StageSelector.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/descriptions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/descriptions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/labels.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/labels.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/presets.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/presets.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store/useStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/store/useStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/index.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -11,6 +35,12 @@
     <persistenceIdMap>
       <entry key="_C:/Users/79819/PycharmProjects/despair_space" value="392e21O1mQkYQ4WpHyyGQcM1KHg" />
     </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="5" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="McpProjectServerCommands">
     <commands />
@@ -30,11 +60,19 @@
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "master",
     "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/79819/PycharmProjects/despair_space",
     "to.speed.mode.migration.done": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\79819\PycharmProjects\despair_space" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useStore, useSelectedCharacter, useSelectedPoint } from '../../store/useStore';
 import { PointEditor } from '../UI/PointEditor';
 import { HistoryView } from '../UI/HistoryView';
@@ -5,6 +6,10 @@ import { STAGE_NAMES, SUBTYPE_NAMES } from '../../data/descriptions';
 import { vectorToText } from '../../data/labels';
 
 export const DetailPanel: React.FC = () => {
+  // Предотвращаем перехват событий Canvas/OrbitControls
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.stopPropagation();
+  }, []);
   const selectedCharacter = useSelectedCharacter();
   const selectedPoint = useSelectedPoint();
   const editingPointId = useStore((state) => state.editingPointId);
@@ -16,7 +21,7 @@ export const DetailPanel: React.FC = () => {
   // Если редактируем точку
   if (editingPointId || isAddingPoint) {
     return (
-      <div className="w-96 h-full bg-slate-900 border-l border-slate-700 flex flex-col">
+      <div className="w-96 h-full bg-slate-900 border-l border-slate-700 flex flex-col relative z-10" onPointerDown={handlePointerDown}>
         <div className="p-4 border-b border-slate-700 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">
             {editingPointId ? 'Редактирование точки' : 'Новая точка'}
@@ -60,7 +65,7 @@ export const DetailPanel: React.FC = () => {
   // Если нет выбранного персонажа
   if (!selectedCharacter) {
     return (
-      <div className="w-96 h-full bg-slate-900 border-l border-slate-700 flex items-center justify-center">
+      <div className="w-96 h-full bg-slate-900 border-l border-slate-700 flex items-center justify-center relative z-10" onPointerDown={handlePointerDown}>
         <div className="text-center text-slate-500 p-8">
           <svg
             className="w-16 h-16 mx-auto mb-4 opacity-50"
@@ -82,7 +87,7 @@ export const DetailPanel: React.FC = () => {
   }
 
   return (
-    <div className="w-96 h-full bg-slate-900 border-l border-slate-700 flex flex-col">
+    <div className="w-96 h-full bg-slate-900 border-l border-slate-700 flex flex-col relative z-10" onPointerDown={handlePointerDown}>
       {/* Заголовок персонажа */}
       <div className="p-4 border-b border-slate-700">
         <div className="flex items-center gap-3">

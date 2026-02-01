@@ -31,7 +31,7 @@ export const PRESET_CHARACTERS: Character[] = [
         stageSubtype: 'intellectual',
         axisSubtypes: {
           infinityType: 'cognition',
-          possibilityType: 'underground',
+          possibilityType: 'paralyzed',
         },
         label: 'Живёт в идее, не видит себя',
         description: `Теория о «право имеющих» заменила реальность. Старуха — не человек, а символ, «вошь». Он не убийца — он экспериментатор. Идея так захватила, что конкретность (кровь, топор, лицо) кажется несущественной. Он не знает, что уже в отчаянии.
@@ -49,7 +49,7 @@ export const PRESET_CHARACTERS: Character[] = [
           consciousness: 0.7,
         },
         stage: 'aesthetic',
-        stageSubtype: 'demonic',
+        stageSubtype: 'intellectual',
         label: 'Реальность ворвалась',
         description: `Идея столкнулась с кровью — и треснула. Лизавета не была в плане. Старуха оказалась не «вошью», а человеком с лицом. Он мечется, лихорадит. Что-то не так — но он ещё не понимает что. Начинает осознавать, что болен, но диагноз ставит неверный.
 
@@ -83,7 +83,7 @@ export const PRESET_CHARACTERS: Character[] = [
           consciousness: 0.9,
         },
         stage: 'religious',
-        stageSubtype: 'religiousness_a',
+        stageSubtype: 'immanent',
         label: 'Принимает вину',
         description: `Идёт в полицию. Не потому что боится наказания — потому что больше не может нести груз. Признание — первый акт подлинного выбора. Он выбирает не идею, а себя. Выбирает быть виновным — а значит, быть человеком.
 
@@ -100,7 +100,7 @@ export const PRESET_CHARACTERS: Character[] = [
           consciousness: 0.6,
         },
         stage: 'ethical',
-        stageSubtype: 'bourgeois',
+        stageSubtype: 'civic',
         label: 'Принял наказание, но не раскаялся',
         description: `На каторге он ещё гордится. Признаёт вину юридически, но не экзистенциально. «Единственно в чём признавал он свое преступление: только в том, что не вынес его и сделал явку с повинной». Он ещё не раскаялся — только сдался.
 
@@ -117,7 +117,7 @@ export const PRESET_CHARACTERS: Character[] = [
           consciousness: 0.95,
         },
         stage: 'religious',
-        stageSubtype: 'religiousness_b',
+        stageSubtype: 'paradoxical',
         label: 'Прыжок веры',
         description: `Болезнь, сон о моровой язве, пробуждение. Видит Соню — и что-то ломается. «Вместо диалектики наступила жизнь». Он не понимает умом — он просто падает к её ногам. Это не логика, это прыжок. Евангелие под подушкой. Семь лет — как семь дней.
 

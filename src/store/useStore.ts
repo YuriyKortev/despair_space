@@ -7,8 +7,68 @@ import type {
   DespairPoint,
   Connection,
   ViewMode,
+  StageSubtype,
+  PossibilitySubtype,
+  NecessitySubtype,
+  FinitudeSubtype,
 } from '../types';
 import { generateCharacterColor } from '../utils/colorUtils';
+
+// Миграция старых подтипов к новым
+const SUBTYPE_MIGRATION: Record<string, string | null> = {
+  // Стадии
+  demonic: null,
+  bourgeois: 'civic',
+  ironic: null,
+  religiousness_a: 'immanent',
+  religiousness_b: 'paradoxical',
+  demonic_religious: null,
+  // Оси
+  narrow_prudence: 'prudent',
+  lost_self: 'conformist',
+  fatalism: 'fatalist',
+  philistine: 'fatalist',
+  determinism: 'determinist',
+  fantasist: 'combinatorial',
+  paralysis: 'paralyzed',
+  underground: 'paralyzed',
+};
+
+const migratePoint = (point: DespairPoint): DespairPoint => {
+  let migrated = { ...point };
+
+  // Миграция stageSubtype
+  if (migrated.stageSubtype && SUBTYPE_MIGRATION[migrated.stageSubtype] !== undefined) {
+    const newSubtype = SUBTYPE_MIGRATION[migrated.stageSubtype];
+    migrated.stageSubtype = newSubtype as StageSubtype | undefined;
+  }
+
+  // Миграция axisSubtypes
+  if (migrated.axisSubtypes) {
+    const axisSubtypes = { ...migrated.axisSubtypes };
+
+    if (axisSubtypes.possibilityType && SUBTYPE_MIGRATION[axisSubtypes.possibilityType] !== undefined) {
+      axisSubtypes.possibilityType = SUBTYPE_MIGRATION[axisSubtypes.possibilityType] as PossibilitySubtype | undefined;
+    }
+    if (axisSubtypes.necessityType && SUBTYPE_MIGRATION[axisSubtypes.necessityType] !== undefined) {
+      axisSubtypes.necessityType = SUBTYPE_MIGRATION[axisSubtypes.necessityType] as NecessitySubtype | undefined;
+    }
+    if (axisSubtypes.finitudeType && SUBTYPE_MIGRATION[axisSubtypes.finitudeType] !== undefined) {
+      axisSubtypes.finitudeType = SUBTYPE_MIGRATION[axisSubtypes.finitudeType] as FinitudeSubtype | undefined;
+    }
+
+    migrated.axisSubtypes = axisSubtypes;
+  }
+
+  return migrated;
+};
+
+const migrateCharacters = (characters: Character[]): Character[] => {
+  return characters.map((char) => ({
+    ...char,
+    points: char.points.map(migratePoint),
+  }));
+};
 
 const initialState = {
   characters: [],
@@ -22,6 +82,8 @@ const initialState = {
   editingPointId: null,
   showCharacterEditor: false,
   editingCharacterId: null,
+  showPathDetail: false,
+  pathDetailPointId: null,
 };
 
 export const useStore = create<Store>()(
@@ -242,6 +304,21 @@ export const useStore = create<Store>()(
         });
       },
 
+      openPathDetail: (pointId) => {
+        set({
+          showPathDetail: true,
+          pathDetailPointId: pointId,
+          selectedPointId: pointId,
+        });
+      },
+
+      closePathDetail: () => {
+        set({
+          showPathDetail: false,
+          pathDetailPointId: null,
+        });
+      },
+
       // ===== IMPORT/EXPORT =====
 
       importCharacter: (character) => {
@@ -287,9 +364,19 @@ export const useStore = create<Store>()(
     }),
     {
       name: 'despair-space-storage',
+      version: 2, // Увеличили версию для миграции
       partialize: (state) => ({
         characters: state.characters,
       }),
+      migrate: (persistedState: unknown, version: number) => {
+        if (version < 2) {
+          const state = persistedState as { characters?: Character[] };
+          if (state.characters) {
+            state.characters = migrateCharacters(state.characters);
+          }
+        }
+        return persistedState as { characters: Character[] };
+      },
     }
   )
 );

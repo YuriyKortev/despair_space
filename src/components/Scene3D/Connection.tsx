@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import { QuadraticBezierLine } from '@react-three/drei';
 import * as THREE from 'three';
+import type { ThreeEvent } from '@react-three/fiber';
 import type { Connection as ConnectionType, DespairPoint } from '../../types';
 import { getConnectionColor } from '../../utils/colorUtils';
+import { useStore } from '../../store/useStore';
 
 interface ConnectionProps {
   connection: ConnectionType;
@@ -17,6 +19,9 @@ export const Connection: React.FC<ConnectionProps> = ({
   toPoint,
   isCharacterSelected,
 }) => {
+  const selectedCharacterId = useStore((state) => state.selectedCharacterId);
+  const deleteConnection = useStore((state) => state.deleteConnection);
+
   const color = getConnectionColor(connection.transitionType);
   const opacity = isCharacterSelected ? 0.8 : 0.3;
 
@@ -54,14 +59,37 @@ export const Connection: React.FC<ConnectionProps> = ({
     return mid;
   }, [startPos, endPos]);
 
+  // Создаём кривую для tube geometry (для клика)
+  const curve = useMemo(() => {
+    return new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(...startPos),
+      new THREE.Vector3(...midPoint),
+      new THREE.Vector3(...endPos)
+    );
+  }, [startPos, midPoint, endPos]);
+
   // Для кризиса делаем линию пунктирной
   const isDashed = connection.transitionType === 'crisis';
 
   // Линия с дополнительной толщиной для кризиса
   const lineWidth = connection.transitionType === 'crisis' ? 3 : 2;
 
+  // Обработчик клика для удаления связи
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    if (e.nativeEvent.shiftKey && selectedCharacterId && isCharacterSelected) {
+      deleteConnection(selectedCharacterId, connection.id);
+    }
+  };
+
   return (
     <group>
+      {/* Невидимая tube для клика */}
+      <mesh onClick={handleClick}>
+        <tubeGeometry args={[curve, 20, 0.02, 8, false]} />
+        <meshBasicMaterial visible={false} />
+      </mesh>
+
       {/* Основная линия */}
       <QuadraticBezierLine
         start={startPos}
@@ -126,7 +154,7 @@ const ArrowHead: React.FC<ArrowHeadProps> = ({ end, mid, color, opacity }) => {
   return (
     <mesh position={position} rotation={rotation}>
       <coneGeometry args={[0.012, 0.03, 8]} />
-      <meshBasicMaterial color={color} transparent opacity={opacity} />
+      <meshBasicMaterial color={color} transparent opacity={opacity} depthWrite={false} />
     </mesh>
   );
 };

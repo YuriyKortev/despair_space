@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import * as THREE from 'three';
 import { Text, Line } from '@react-three/drei';
 import { COLORS } from '../../utils/colorUtils';
 import type { AxisConfig } from '../../types';
@@ -32,6 +34,17 @@ const axisConfigs: AxisConfig[] = [
   },
 ];
 
+// Вычисляем ротацию для направления конуса в сторону оси
+const getArrowRotation = (direction: [number, number, number]): [number, number, number] => {
+  const [dx, dy, dz] = direction;
+  // Конус по умолчанию направлен вверх (+Y)
+  // Нужно повернуть его в направлении оси
+  if (dx === 1) return [0, 0, -Math.PI / 2]; // X: повернуть на -90° вокруг Z
+  if (dy === 1) return [0, 0, 0];             // Y: без поворота
+  if (dz === 1) return [Math.PI / 2, 0, 0];   // Z: повернуть на 90° вокруг X
+  return [0, 0, 0];
+};
+
 interface AxisProps {
   config: AxisConfig;
   direction: [number, number, number];
@@ -62,6 +75,8 @@ const Axis: React.FC<AxisProps> = ({ config, direction }) => {
     dz * (AXIS_LENGTH + LABEL_OFFSET),
   ];
 
+  const arrowRotation = getArrowRotation(direction);
+
   return (
     <group>
       {/* Линия оси */}
@@ -89,7 +104,6 @@ const Axis: React.FC<AxisProps> = ({ config, direction }) => {
         color={config.color}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Regular.woff"
       >
         {config.labels.start}
       </Text>
@@ -101,19 +115,21 @@ const Axis: React.FC<AxisProps> = ({ config, direction }) => {
         color={config.color}
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Inter-Regular.woff"
       >
         {config.labels.end}
       </Text>
 
       {/* Стрелка на конце */}
-      <mesh position={endPoint} rotation={[0, 0, Math.atan2(dy, dx)]}>
+      <mesh position={endPoint} rotation={arrowRotation}>
         <coneGeometry args={[0.015, 0.04, 8]} />
         <meshBasicMaterial color={config.color} />
       </mesh>
     </group>
   );
 };
+
+// Геометрия куба создаётся один раз
+const unitBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
 export const Axes: React.FC = () => {
   const directions: [number, number, number][] = [
@@ -122,26 +138,27 @@ export const Axes: React.FC = () => {
     [0, 0, 1], // Z - consciousness
   ];
 
+  // Создаём edgesGeometry один раз
+  const edgesGeometry = useMemo(() => new THREE.EdgesGeometry(unitBoxGeometry), []);
+
   return (
     <group>
       {axisConfigs.map((config, i) => (
         <Axis key={config.name} config={config} direction={directions[i]} />
       ))}
 
-      {/* Куб единичного пространства (wireframe) */}
-      <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(1, 1, 1)]} />
+      {/* Куб единичного пространства (wireframe) - позиционирован в центр 0-1 */}
+      <lineSegments position={[0.5, 0.5, 0.5]} geometry={edgesGeometry}>
         <lineBasicMaterial color="#ffffff" opacity={0.1} transparent />
       </lineSegments>
+
+      {/* Полупрозрачный куб */}
       <mesh position={[0.5, 0.5, 0.5]}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="#ffffff" opacity={0.02} transparent />
+        <meshBasicMaterial color="#ffffff" opacity={0.02} transparent depthWrite={false} />
       </mesh>
     </group>
   );
 };
-
-// Нужен импорт THREE для BoxGeometry
-import * as THREE from 'three';
 
 export default Axes;

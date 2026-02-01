@@ -1,14 +1,22 @@
+import { useCallback } from 'react';
 import { useStore } from '../../store/useStore';
 import { CharacterList } from '../UI/CharacterList';
 import { CharacterEditor } from '../UI/CharacterEditor';
 
 export const Sidebar: React.FC = () => {
+  // Предотвращаем перехват событий Canvas/OrbitControls
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.stopPropagation();
+  }, []);
   const showCharacterEditor = useStore((state) => state.showCharacterEditor);
   const editingCharacterId = useStore((state) => state.editingCharacterId);
   const openCharacterEditor = useStore((state) => state.openCharacterEditor);
 
   return (
-    <div className="w-80 h-full bg-slate-900 border-r border-slate-700 flex flex-col">
+    <div
+      className="w-80 h-full bg-slate-900 border-r border-slate-700 flex flex-col relative z-10"
+      onPointerDown={handlePointerDown}
+    >
       {/* Заголовок */}
       <div className="p-4 border-b border-slate-700">
         <h1 className="text-lg font-semibold text-white">

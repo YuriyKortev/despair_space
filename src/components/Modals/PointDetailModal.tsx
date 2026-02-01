@@ -1,5 +1,6 @@
 import { useStore, useSelectedCharacter, useSelectedPoint } from '../../store/useStore';
 import { STAGE_NAMES, SUBTYPE_NAMES } from '../../data/descriptions';
+import { generateProceduralDescription } from '../../data/labels';
 import { COLORS } from '../../utils/colorUtils';
 import { copyHistoryToPoint } from '../../utils/graphUtils';
 
@@ -144,11 +145,25 @@ export const PointDetailModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Описание */}
+          {/* Пользовательское описание */}
+          {point.description && (
+            <div>
+              <h3 className="text-sm font-medium text-slate-400 mb-2">
+                Описание автора
+              </h3>
+              <div className="text-slate-300 whitespace-pre-wrap leading-relaxed bg-slate-800/50 p-3 rounded-lg border-l-2 border-violet-500">
+                {point.description}
+              </div>
+            </div>
+          )}
+
+          {/* Процедурное описание */}
           <div>
-            <h3 className="text-sm font-medium text-slate-400 mb-2">Описание</h3>
+            <h3 className="text-sm font-medium text-slate-400 mb-2">
+              Анализ состояния
+            </h3>
             <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">
-              {point.description}
+              {generateProceduralDescription(point)}
             </div>
           </div>
         </div>
