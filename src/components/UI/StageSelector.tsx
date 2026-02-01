@@ -1,6 +1,6 @@
 import type { Stage, StageSubtype } from '../../types';
-import { STAGE_NAMES, STAGE_DESCRIPTIONS, SUBTYPE_NAMES } from '../../data/descriptions';
 import { COLORS } from '../../utils/colorUtils';
+import { useT, useDescriptions } from '../../store/useLanguageStore';
 
 interface StageSelectorProps {
   stage: Stage;
@@ -21,7 +21,25 @@ export const StageSelector: React.FC<StageSelectorProps> = ({
   onStageChange,
   onSubtypeChange,
 }) => {
+  const t = useT();
+  const descriptions = useDescriptions();
   const stages: Stage[] = ['aesthetic', 'ethical', 'religious'];
+
+  const stageNames: Record<Stage, string> = {
+    aesthetic: t.stages.aesthetic,
+    ethical: t.stages.ethical,
+    religious: t.stages.religious,
+  };
+
+  const subtypeNames: Record<string, string> = {
+    sensual: t.stageSubtypes.sensual,
+    romantic: t.stageSubtypes.romantic,
+    intellectual: t.stageSubtypes.intellectual,
+    civic: t.stageSubtypes.civic,
+    heroic: t.stageSubtypes.heroic,
+    immanent: t.stageSubtypes.immanent,
+    paradoxical: t.stageSubtypes.paradoxical,
+  };
 
   const handleStageChange = (newStage: Stage) => {
     onStageChange(newStage);
@@ -33,7 +51,7 @@ export const StageSelector: React.FC<StageSelectorProps> = ({
       {/* Выбор стадии */}
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">
-          Стадия существования
+          {t.stages.title}
         </label>
         <div className="grid grid-cols-3 gap-2">
           {stages.map((s) => (
@@ -55,23 +73,26 @@ export const StageSelector: React.FC<StageSelectorProps> = ({
                 borderColor: stage === s ? COLORS.stages[s] : undefined,
               }}
             >
-              {STAGE_NAMES[s]}
+              {stageNames[s]}
             </button>
           ))}
         </div>
         <p className="text-xs text-slate-500 mt-2">
-          {STAGE_DESCRIPTIONS[stage].base.short}
+          {descriptions.stages[stage].base.short}
         </p>
       </div>
 
       {/* Выбор подтипа */}
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-2">
-          Подтип стадии
+          {t.stages.title}
         </label>
         <div className="space-y-1">
           {STAGE_SUBTYPES[stage].map((st) => {
-            const desc = STAGE_DESCRIPTIONS[stage].subtypes[st];
+            // Access subtype descriptions safely
+            const stageDescriptions = descriptions.stages[stage];
+            const subtypeKey = st as keyof typeof stageDescriptions.subtypes;
+            const desc = stageDescriptions.subtypes[subtypeKey] as { short: string; full: string } | undefined;
             return (
               <button
                 key={st}
@@ -92,7 +113,7 @@ export const StageSelector: React.FC<StageSelectorProps> = ({
                 }}
               >
                 <div className="font-medium text-white">
-                  {SUBTYPE_NAMES[st] || st}
+                  {subtypeNames[st] || st}
                 </div>
                 {desc && (
                   <div className="text-xs text-slate-400 mt-0.5">{desc.short}</div>

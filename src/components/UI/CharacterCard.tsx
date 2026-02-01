@@ -1,11 +1,13 @@
 import type { Character } from '../../types';
 import { useStore } from '../../store/useStore';
+import { useT } from '../../store/useLanguageStore';
 
 interface CharacterCardProps {
   character: Character;
 }
 
 export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
+  const t = useT();
   const selectedCharacterId = useStore((state) => state.selectedCharacterId);
   const hiddenCharacterIds = useStore((state) => state.hiddenCharacterIds);
   const selectCharacter = useStore((state) => state.selectCharacter);
@@ -35,7 +37,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(`Удалить персонажа "${character.name}"?`)) {
+    if (confirm(`${t.characters.confirmDelete}`)) {
       deleteCharacter(character.id);
     }
   };
@@ -60,7 +62,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
         <div className="flex-1 min-w-0">
           <div className="font-medium text-white truncate">{character.name}</div>
           <div className="text-xs text-slate-400">
-            {character.points.length} точек · {character.connections.length} связей
+            {character.points.length} {t.characters.points} · {character.connections.length} {t.characters.connections}
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -70,7 +72,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
               toggleCharacterVisibility(character.id);
             }}
             className="p-1.5 hover:bg-slate-600 rounded transition-colors"
-            title={isHidden ? 'Показать' : 'Скрыть'}
+            title={isHidden ? t.characters.show : t.characters.hide}
           >
             {isHidden ? (
               <svg
@@ -114,7 +116,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
               openCharacterEditor(character.id);
             }}
             className="p-1.5 hover:bg-slate-600 rounded transition-colors"
-            title="Редактировать"
+            title={t.actions.edit}
           >
             <svg
               className="w-4 h-4 text-slate-400"
@@ -133,7 +135,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
           <button
             onClick={handleExport}
             className="p-1.5 hover:bg-slate-600 rounded transition-colors"
-            title="Экспортировать"
+            title={t.characters.export}
           >
             <svg
               className="w-4 h-4 text-slate-400"
@@ -152,7 +154,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ character }) => {
           <button
             onClick={handleDelete}
             className="p-1.5 hover:bg-red-600/50 rounded transition-colors"
-            title="Удалить"
+            title={t.actions.delete}
           >
             <svg
               className="w-4 h-4 text-slate-400"

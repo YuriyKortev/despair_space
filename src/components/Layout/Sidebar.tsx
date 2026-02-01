@@ -1,9 +1,12 @@
 import { useCallback } from 'react';
 import { useStore } from '../../store/useStore';
+import { useT } from '../../store/useLanguageStore';
 import { CharacterList } from '../UI/CharacterList';
 import { CharacterEditor } from '../UI/CharacterEditor';
+import { LanguageSelector } from '../UI/LanguageSelector';
 
 export const Sidebar: React.FC = () => {
+  const t = useT();
   // Предотвращаем перехват событий Canvas/OrbitControls
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
@@ -19,12 +22,19 @@ export const Sidebar: React.FC = () => {
     >
       {/* Заголовок */}
       <div className="p-4 border-b border-slate-700">
-        <h1 className="text-lg font-semibold text-white">
-          Пространство Отчаяния
-        </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          3D визуализатор Кьеркегора
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-lg font-semibold text-white">
+              {t.appTitle}
+            </h1>
+            <p className="text-xs text-slate-400 mt-1">
+              {t.appSubtitle}
+            </p>
+          </div>
+        </div>
+        <div className="mt-3">
+          <LanguageSelector />
+        </div>
       </div>
 
       {/* Контент */}
@@ -57,7 +67,7 @@ export const Sidebar: React.FC = () => {
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                Добавить персонажа
+                {t.characters.addCharacter}
               </button>
             </div>
           </>

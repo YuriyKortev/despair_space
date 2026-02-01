@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { useStore, useSelectedCharacter, useSelectedPoint } from '../../store/useStore';
+import { useT } from '../../store/useLanguageStore';
 import { PointEditor } from '../UI/PointEditor';
 import { HistoryView } from '../UI/HistoryView';
-import { STAGE_NAMES, SUBTYPE_NAMES } from '../../data/descriptions';
-import { vectorToText } from '../../data/labels';
 
 export const DetailPanel: React.FC = () => {
+  const t = useT();
   // Предотвращаем перехват событий Canvas/OrbitControls
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.stopPropagation();
@@ -18,13 +18,29 @@ export const DetailPanel: React.FC = () => {
   const isAddingPoint = useStore((state) => state.isAddingPoint);
   const setAddingPoint = useStore((state) => state.setAddingPoint);
 
+  const stageNames = {
+    aesthetic: t.stages.aesthetic,
+    ethical: t.stages.ethical,
+    religious: t.stages.religious,
+  };
+
+  const subtypeNames: Record<string, string> = {
+    sensual: t.stageSubtypes.sensual,
+    romantic: t.stageSubtypes.romantic,
+    intellectual: t.stageSubtypes.intellectual,
+    civic: t.stageSubtypes.civic,
+    heroic: t.stageSubtypes.heroic,
+    immanent: t.stageSubtypes.immanent,
+    paradoxical: t.stageSubtypes.paradoxical,
+  };
+
   // Если редактируем точку
   if (editingPointId || isAddingPoint) {
     return (
       <div className="w-96 h-full bg-slate-900 border-l border-slate-700 flex flex-col relative z-10" onPointerDown={handlePointerDown}>
         <div className="p-4 border-b border-slate-700 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">
-            {editingPointId ? 'Редактирование точки' : 'Новая точка'}
+            {editingPointId ? t.points.editPoint : t.points.addPoint}
           </h2>
           <button
             onClick={() => {
@@ -80,7 +96,7 @@ export const DetailPanel: React.FC = () => {
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             />
           </svg>
-          <p>Выберите персонажа для просмотра его траектории</p>
+          <p>{t.points.selectCharacterFirst}</p>
         </div>
       </div>
     );
@@ -100,8 +116,8 @@ export const DetailPanel: React.FC = () => {
           </h2>
         </div>
         <p className="text-sm text-slate-400 mt-1">
-          {selectedCharacter.points.length} точек ·{' '}
-          {selectedCharacter.connections.length} связей
+          {selectedCharacter.points.length} {t.characters.points} ·{' '}
+          {selectedCharacter.connections.length} {t.characters.connections}
         </p>
       </div>
 
@@ -110,13 +126,13 @@ export const DetailPanel: React.FC = () => {
         <div className="p-4 border-b border-slate-700 bg-slate-800/50">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-slate-300">
-              Выбранная точка
+              {t.points.viewDetails}
             </h3>
             <button
               onClick={() => openPointEditor(selectedPoint.id)}
               className="text-xs text-violet-400 hover:text-violet-300"
             >
-              Редактировать
+              {t.actions.edit}
             </button>
           </div>
           {selectedPoint.momentName && (
@@ -127,11 +143,11 @@ export const DetailPanel: React.FC = () => {
           <div className="text-white font-medium mb-2">{selectedPoint.label}</div>
           <div className="text-xs text-slate-400 space-y-1">
             <div>
-              Стадия: {STAGE_NAMES[selectedPoint.stage]}
+              {t.pointDetail.stage}: {stageNames[selectedPoint.stage]}
               {selectedPoint.stageSubtype &&
-                ` (${SUBTYPE_NAMES[selectedPoint.stageSubtype]})`}
+                ` (${subtypeNames[selectedPoint.stageSubtype]})`}
             </div>
-            <div>Координаты: {vectorToText(selectedPoint.vector)}</div>
+            <div>{t.pointDetail.coordinates}: {Math.round(selectedPoint.vector.finiteInfinite * 100)}% / {Math.round(selectedPoint.vector.necessityPossibility * 100)}% / {Math.round(selectedPoint.vector.consciousness * 100)}%</div>
           </div>
         </div>
       )}
@@ -160,10 +176,10 @@ export const DetailPanel: React.FC = () => {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          Добавить точку
+          {t.points.addPoint}
         </button>
         <p className="text-xs text-slate-500 text-center">
-          Shift+клик на точке для создания связи
+          {t.shortcuts.shiftClickToConnect}
         </p>
       </div>
     </div>

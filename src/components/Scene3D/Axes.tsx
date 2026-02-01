@@ -2,37 +2,11 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { Text, Line } from '@react-three/drei';
 import { COLORS } from '../../utils/colorUtils';
+import { useT } from '../../store/useLanguageStore';
 import type { AxisConfig } from '../../types';
 
 const AXIS_LENGTH = 1.2;
 const LABEL_OFFSET = 0.15;
-
-const axisConfigs: AxisConfig[] = [
-  {
-    name: 'finiteInfinite',
-    color: COLORS.axes.finiteInfinite,
-    labels: {
-      start: 'КОНЕЧНОЕ',
-      end: 'БЕСКОНЕЧНОЕ',
-    },
-  },
-  {
-    name: 'necessityPossibility',
-    color: COLORS.axes.necessityPossibility,
-    labels: {
-      start: 'НЕОБХОДИМОСТЬ',
-      end: 'ВОЗМОЖНОСТЬ',
-    },
-  },
-  {
-    name: 'consciousness',
-    color: COLORS.axes.consciousness,
-    labels: {
-      start: 'НЕВЕДЕНИЕ',
-      end: 'ОСОЗНАННОСТЬ',
-    },
-  },
-];
 
 // Вычисляем ротацию для направления конуса в сторону оси
 const getArrowRotation = (direction: [number, number, number]): [number, number, number] => {
@@ -132,11 +106,40 @@ const Axis: React.FC<AxisProps> = ({ config, direction }) => {
 const unitBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
 
 export const Axes: React.FC = () => {
+  const t = useT();
+
   const directions: [number, number, number][] = [
     [1, 0, 0], // X - finiteInfinite
     [0, 1, 0], // Y - necessityPossibility
     [0, 0, 1], // Z - consciousness
   ];
+
+  const axisConfigs: AxisConfig[] = useMemo(() => [
+    {
+      name: 'finiteInfinite',
+      color: COLORS.axes.finiteInfinite,
+      labels: {
+        start: t.axes.finite.toUpperCase(),
+        end: t.axes.infinite.toUpperCase(),
+      },
+    },
+    {
+      name: 'necessityPossibility',
+      color: COLORS.axes.necessityPossibility,
+      labels: {
+        start: t.axes.necessity.toUpperCase(),
+        end: t.axes.possibility.toUpperCase(),
+      },
+    },
+    {
+      name: 'consciousness',
+      color: COLORS.axes.consciousness,
+      labels: {
+        start: t.axes.unawareness.toUpperCase(),
+        end: t.axes.awareness.toUpperCase(),
+      },
+    },
+  ], [t]);
 
   // Создаём edgesGeometry один раз
   const edgesGeometry = useMemo(() => new THREE.EdgesGeometry(unitBoxGeometry), []);

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useStore, useCharacterById } from '../../store/useStore';
+import { useT } from '../../store/useLanguageStore';
 import { CHARACTER_COLORS } from '../../utils/colorUtils';
-import { PRESET_CHARACTERS } from '../../data/presets';
+import { getPresetCharacters } from '../../data/presets';
 import type { CharacterCore } from '../../types';
 
 interface CharacterEditorProps {
@@ -9,6 +10,8 @@ interface CharacterEditorProps {
 }
 
 export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId }) => {
+  const t = useT();
+  const presetCharacters = useMemo(() => getPresetCharacters(t), [t]);
   const character = useCharacterById(characterId);
   const addCharacter = useStore((state) => state.addCharacter);
   const updateCharacter = useStore((state) => state.updateCharacter);
@@ -72,7 +75,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
             importCharacter(data);
             closeCharacterEditor();
           } catch {
-            alert('Ошибка при импорте файла');
+            alert(t.characters.importError);
           }
         };
         reader.readAsText(file);
@@ -101,7 +104,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
     <form onSubmit={handleSubmit} className="flex flex-col h-full">
       <div className="p-4 border-b border-slate-700 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">
-          {isEditing ? 'Редактирование' : 'Новый персонаж'}
+          {isEditing ? t.characters.editCharacter : t.characters.addCharacter}
         </h2>
         <button
           type="button"
@@ -128,13 +131,13 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
         {/* Имя */}
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-1">
-            Имя персонажа
+            {t.characters.name}
           </label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Например: Раскольников"
+            placeholder={t.characters.namePlaceholder}
             className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
             required
           />
@@ -143,7 +146,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
         {/* Цвет */}
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">
-            Цвет траектории
+            {t.characters.color}
           </label>
           <div className="flex flex-wrap gap-2">
             {CHARACTER_COLORS.map((c) => (
@@ -163,7 +166,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
         {/* История */}
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">
-            Ключевые события прошлого
+            {t.characterCore.history}
           </label>
           <div className="space-y-2">
             {history.map((item, index) => (
@@ -172,7 +175,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
                   type="text"
                   value={item}
                   onChange={(e) => updateHistoryItem(index, e.target.value)}
-                  placeholder="Событие..."
+                  placeholder={t.characterCore.historyPlaceholder}
                   className="flex-1 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
                 <button
@@ -202,7 +205,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
               onClick={addHistoryItem}
               className="w-full py-2 border border-dashed border-slate-600 rounded-lg text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors"
             >
-              + Добавить событие
+              + {t.characterCore.addEvent}
             </button>
           </div>
         </div>
@@ -210,12 +213,12 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
         {/* Тело */}
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-1">
-            Физическое описание
+            {t.characterCore.body}
           </label>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Внешность, особенности..."
+            placeholder={t.characterCore.bodyPlaceholder}
             rows={2}
             className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
           />
@@ -224,13 +227,13 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
         {/* Дар */}
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-1">
-            Талант / Способность
+            {t.characterCore.gift}
           </label>
           <input
             type="text"
             value={gift}
             onChange={(e) => setGift(e.target.value)}
-            placeholder="Например: Ум, способность к теории"
+            placeholder={t.characterCore.giftPlaceholder}
             className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
         </div>
@@ -243,7 +246,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
           disabled={!name.trim()}
           className="w-full py-2 px-4 bg-violet-600 hover:bg-violet-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
         >
-          {isEditing ? 'Сохранить' : 'Создать'}
+          {isEditing ? t.actions.save : t.actions.save}
         </button>
         {!isEditing && (
           <>
@@ -252,13 +255,13 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ characterId })
               onClick={handleImport}
               className="w-full py-2 px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
             >
-              Импортировать из файла
+              {t.characters.import}
             </button>
-            {PRESET_CHARACTERS.length > 0 && (
+            {presetCharacters.length > 0 && (
               <div className="pt-2 border-t border-slate-700 mt-2">
-                <p className="text-xs text-slate-500 mb-2">Загрузить пример:</p>
+                <p className="text-xs text-slate-500 mb-2">{t.characters.loadExample}</p>
                 <div className="flex flex-wrap gap-2">
-                  {PRESET_CHARACTERS.map((preset) => (
+                  {presetCharacters.map((preset) => (
                     <button
                       key={preset.id}
                       type="button"

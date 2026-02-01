@@ -1,10 +1,12 @@
 import { useStore, useSelectedCharacter, useSelectedPoint } from '../../store/useStore';
-import { STAGE_NAMES, SUBTYPE_NAMES } from '../../data/descriptions';
-import { generateProceduralDescription } from '../../data/labels';
+import { useT, useDescriptions } from '../../store/useLanguageStore';
+import { generateProceduralDescriptionLocalized } from '../../data/labels';
 import { COLORS } from '../../utils/colorUtils';
 import { copyHistoryToPoint } from '../../utils/graphUtils';
 
 export const PointDetailModal: React.FC = () => {
+  const t = useT();
+  const descriptions = useDescriptions();
   const closePointDetail = useStore((state) => state.closePointDetail);
   const openPointEditor = useStore((state) => state.openPointEditor);
   const character = useSelectedCharacter();
@@ -13,6 +15,22 @@ export const PointDetailModal: React.FC = () => {
   if (!point || !character) return null;
 
   const stageColor = COLORS.stages[point.stage];
+
+  const stageNames = {
+    aesthetic: t.stages.aesthetic,
+    ethical: t.stages.ethical,
+    religious: t.stages.religious,
+  };
+
+  const subtypeNames: Record<string, string> = {
+    sensual: t.stageSubtypes.sensual,
+    romantic: t.stageSubtypes.romantic,
+    intellectual: t.stageSubtypes.intellectual,
+    civic: t.stageSubtypes.civic,
+    heroic: t.stageSubtypes.heroic,
+    immanent: t.stageSubtypes.immanent,
+    paradoxical: t.stageSubtypes.paradoxical,
+  };
 
   const handleCopy = async () => {
     const text = copyHistoryToPoint(character, point.id);
@@ -48,11 +66,11 @@ export const PointDetailModal: React.FC = () => {
                     style={{ backgroundColor: stageColor }}
                   />
                   <span className="text-sm text-slate-300">
-                    {STAGE_NAMES[point.stage]}
+                    {stageNames[point.stage]}
                     {point.stageSubtype && (
                       <span className="text-slate-500">
                         {' '}
-                        · {SUBTYPE_NAMES[point.stageSubtype]}
+                        · {subtypeNames[point.stageSubtype]}
                       </span>
                     )}
                   </span>
@@ -85,7 +103,7 @@ export const PointDetailModal: React.FC = () => {
           {/* Координаты */}
           <div>
             <h3 className="text-sm font-medium text-slate-400 mb-2">
-              Координаты в пространстве
+              {t.pointDetail.coordinates}
             </h3>
             <div className="grid grid-cols-3 gap-3">
               <div className="p-3 bg-slate-800 rounded-lg">
@@ -93,17 +111,17 @@ export const PointDetailModal: React.FC = () => {
                   className="text-xs font-medium mb-1"
                   style={{ color: COLORS.axes.finiteInfinite }}
                 >
-                  Конечное ↔ Бесконечное
+                  {t.axes.finiteInfinite}
                 </div>
                 <div className="text-lg font-semibold text-white">
                   {Math.round(point.vector.finiteInfinite * 100)}%
                 </div>
                 <div className="text-xs text-slate-500">
                   {point.vector.finiteInfinite < 0.4
-                    ? 'Конечное'
+                    ? t.axes.finite
                     : point.vector.finiteInfinite > 0.6
-                    ? 'Бесконечное'
-                    : 'Баланс'}
+                    ? t.axes.infinite
+                    : t.axes.balance}
                 </div>
               </div>
               <div className="p-3 bg-slate-800 rounded-lg">
@@ -111,17 +129,17 @@ export const PointDetailModal: React.FC = () => {
                   className="text-xs font-medium mb-1"
                   style={{ color: COLORS.axes.necessityPossibility }}
                 >
-                  Необходимость ↔ Возможность
+                  {t.axes.necessityPossibility}
                 </div>
                 <div className="text-lg font-semibold text-white">
                   {Math.round(point.vector.necessityPossibility * 100)}%
                 </div>
                 <div className="text-xs text-slate-500">
                   {point.vector.necessityPossibility < 0.4
-                    ? 'Необходимость'
+                    ? t.axes.necessity
                     : point.vector.necessityPossibility > 0.6
-                    ? 'Возможность'
-                    : 'Баланс'}
+                    ? t.axes.possibility
+                    : t.axes.balance}
                 </div>
               </div>
               <div className="p-3 bg-slate-800 rounded-lg">
@@ -129,17 +147,17 @@ export const PointDetailModal: React.FC = () => {
                   className="text-xs font-medium mb-1"
                   style={{ color: COLORS.axes.consciousness }}
                 >
-                  Неведение ↔ Осознанность
+                  {t.axes.consciousness}
                 </div>
                 <div className="text-lg font-semibold text-white">
                   {Math.round(point.vector.consciousness * 100)}%
                 </div>
                 <div className="text-xs text-slate-500">
                   {point.vector.consciousness < 0.4
-                    ? 'Неведение'
+                    ? t.axes.unawareness
                     : point.vector.consciousness > 0.6
-                    ? 'Осознанность'
-                    : 'Полуосознанность'}
+                    ? t.axes.awareness
+                    : t.axes.semiconscious}
                 </div>
               </div>
             </div>
@@ -149,7 +167,7 @@ export const PointDetailModal: React.FC = () => {
           {point.description && (
             <div>
               <h3 className="text-sm font-medium text-slate-400 mb-2">
-                Описание автора
+                {t.pathDetail.authorDescription}
               </h3>
               <div className="text-slate-300 whitespace-pre-wrap leading-relaxed bg-slate-800/50 p-3 rounded-lg border-l-2 border-violet-500">
                 {point.description}
@@ -160,10 +178,10 @@ export const PointDetailModal: React.FC = () => {
           {/* Процедурное описание */}
           <div>
             <h3 className="text-sm font-medium text-slate-400 mb-2">
-              Анализ состояния
+              {t.pointDetail.stage}
             </h3>
             <div className="text-slate-300 whitespace-pre-wrap leading-relaxed">
-              {generateProceduralDescription(point)}
+              {generateProceduralDescriptionLocalized(point, t, descriptions)}
             </div>
           </div>
         </div>
@@ -187,7 +205,7 @@ export const PointDetailModal: React.FC = () => {
                 d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
               />
             </svg>
-            Копировать историю
+            {t.characters.copyPrompt}
           </button>
           <button
             onClick={() => {
@@ -196,7 +214,7 @@ export const PointDetailModal: React.FC = () => {
             }}
             className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors"
           >
-            Редактировать
+            {t.actions.edit}
           </button>
         </div>
       </div>

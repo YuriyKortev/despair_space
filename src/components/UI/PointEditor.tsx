@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useStore, useCharacterById } from '../../store/useStore';
+import { useT, useDescriptions } from '../../store/useLanguageStore';
 import { VectorSliders } from './VectorSliders';
 import { StageSelector } from './StageSelector';
-import { generateLabel, generateDescription, getSuggestedAxisSubtypes } from '../../data/labels';
-import { ZONE_DESCRIPTIONS, SUBTYPE_NAMES } from '../../data/descriptions';
+import { generateLabelLocalized, generateProceduralDescriptionLocalized, getSuggestedAxisSubtypes } from '../../data/labels';
 import type {
   DespairVector,
   Stage,
@@ -34,6 +34,7 @@ interface AxisSubtypeSelectorProps {
   value: string | undefined;
   onChange: (value: string | undefined) => void;
   descriptions: Record<string, { short: string; full: string }>;
+  subtypeNames: Record<string, string>;
 }
 
 const AxisSubtypeSelector: React.FC<AxisSubtypeSelectorProps> = ({
@@ -43,6 +44,7 @@ const AxisSubtypeSelector: React.FC<AxisSubtypeSelectorProps> = ({
   value,
   onChange,
   descriptions,
+  subtypeNames,
 }) => {
   return (
     <div className="p-3 bg-slate-800/50 rounded-lg">
@@ -65,7 +67,7 @@ const AxisSubtypeSelector: React.FC<AxisSubtypeSelectorProps> = ({
               `}
               title={desc?.short}
             >
-              {SUBTYPE_NAMES[opt] || opt}
+              {subtypeNames[opt] || opt}
             </button>
           );
         })}
@@ -90,6 +92,8 @@ export const PointEditor: React.FC<PointEditorProps> = ({
   pointId,
   onClose,
 }) => {
+  const t = useT();
+  const descriptions = useDescriptions();
   const character = useCharacterById(characterId);
   const addPoint = useStore((state) => state.addPoint);
   const updatePoint = useStore((state) => state.updatePoint);
@@ -97,6 +101,25 @@ export const PointEditor: React.FC<PointEditorProps> = ({
 
   const existingPoint = character?.points.find((p) => p.id === pointId);
   const isEditing = !!existingPoint;
+
+  // Build subtype names from translations
+  const subtypeNames: Record<string, string> = {
+    imagination: t.axisSubtypes.imagination,
+    cognition: t.axisSubtypes.cognition,
+    feeling: t.axisSubtypes.feeling,
+    will: t.axisSubtypes.will,
+    conformist: t.axisSubtypes.conformist,
+    prudent: t.axisSubtypes.prudent,
+    combinatorial: t.axisSubtypes.combinatorial,
+    paralyzed: t.axisSubtypes.paralyzed,
+    fatalist: t.axisSubtypes.fatalist,
+    determinist: t.axisSubtypes.determinist,
+    naive: t.axisSubtypes.naive,
+    busy: t.axisSubtypes.busy,
+    denial: t.axisSubtypes.denial,
+    suffering: t.axisSubtypes.suffering,
+    defiant: t.axisSubtypes.defiant,
+  };
 
   const [vector, setVector] = useState<DespairVector>({
     finiteInfinite: 0.5,
@@ -154,12 +177,12 @@ export const PointEditor: React.FC<PointEditorProps> = ({
     };
 
     if (useAutoLabel) {
-      setLabel(generateLabel(tempPoint));
+      setLabel(generateLabelLocalized(tempPoint, t));
     }
     if (useAutoDescription) {
-      setDescription(generateDescription(tempPoint));
+      setDescription(generateProceduralDescriptionLocalized(tempPoint, t, descriptions));
     }
-  }, [vector, stage, stageSubtype, axisSubtypes, useAutoLabel, useAutoDescription]);
+  }, [vector, stage, stageSubtype, axisSubtypes, useAutoLabel, useAutoDescription, t, descriptions]);
 
   // При изменении подтипов осей принудительно обновляем описание
   useEffect(() => {
@@ -175,12 +198,12 @@ export const PointEditor: React.FC<PointEditorProps> = ({
         axisSubtypes,
         label: '',
       };
-      setDescription(generateDescription(tempPoint));
+      setDescription(generateProceduralDescriptionLocalized(tempPoint, t, descriptions));
       setUseAutoDescription(true);
     }
 
     prevAxisSubtypesRef.current = currentStr;
-  }, [axisSubtypes, vector, stage, stageSubtype]);
+  }, [axisSubtypes, vector, stage, stageSubtype, t, descriptions]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,7 +252,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
   };
 
   const handleDelete = () => {
-    if (characterId && pointId && confirm('Удалить эту точку?')) {
+    if (characterId && pointId && confirm(t.points.confirmDelete)) {
       deletePoint(characterId, pointId);
       onClose();
     }
@@ -238,7 +261,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
   if (!character) {
     return (
       <div className="p-4 text-center text-slate-500">
-        Сначала выберите персонажа
+        {t.points.selectCharacterFirst}
       </div>
     );
   }
@@ -248,13 +271,13 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       {/* Название момента */}
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-1">
-          Название момента (опционально)
+          {t.points.momentName}
         </label>
         <input
           type="text"
           value={momentName}
           onChange={(e) => setMomentName(e.target.value)}
-          placeholder="Например: До убийства"
+          placeholder={t.points.momentNamePlaceholder}
           className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
         />
       </div>
@@ -262,7 +285,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       {/* Координаты */}
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-3">
-          Координаты в пространстве
+          {t.points.coordinates}
         </label>
         <VectorSliders vector={vector} onChange={setVector} />
       </div>
@@ -281,87 +304,93 @@ export const PointEditor: React.FC<PointEditorProps> = ({
         suggestedAxes.showUnawareness || suggestedAxes.showAwareness) && (
         <div className="space-y-3">
           <label className="block text-sm font-medium text-slate-300">
-            Подтипы отчаяния по осям
+            {t.axisSubtypes.despairOfInfinity}
           </label>
 
           {/* Бесконечность */}
           {suggestedAxes.showInfinity && (
             <AxisSubtypeSelector
-              title="Отчаяние бесконечности"
-              subtitle="Координата X > 60%"
+              title={t.axisSubtypes.despairOfInfinity}
+              subtitle={`${t.axisSubtypes.coordinateAbove} (X)`}
               options={['imagination', 'cognition', 'feeling', 'will'] as InfinitySubtype[]}
               value={axisSubtypes.infinityType}
               onChange={(v) => setAxisSubtypes({ ...axisSubtypes, infinityType: v as InfinitySubtype | undefined })}
-              descriptions={ZONE_DESCRIPTIONS.infinite}
+              descriptions={descriptions.infinite}
+              subtypeNames={subtypeNames}
             />
           )}
 
           {/* Конечность */}
           {suggestedAxes.showFinitude && (
             <AxisSubtypeSelector
-              title="Отчаяние конечности"
-              subtitle="Координата X < 40%"
+              title={t.axisSubtypes.despairOfFinitude}
+              subtitle={`${t.axisSubtypes.coordinateBelow} (X)`}
               options={['conformist', 'prudent'] as FinitudeSubtype[]}
               value={axisSubtypes.finitudeType}
               onChange={(v) => setAxisSubtypes({ ...axisSubtypes, finitudeType: v as FinitudeSubtype | undefined })}
-              descriptions={ZONE_DESCRIPTIONS.finite}
+              descriptions={descriptions.finite}
+              subtypeNames={subtypeNames}
             />
           )}
 
           {/* Возможность */}
           {suggestedAxes.showPossibility && (
             <AxisSubtypeSelector
-              title="Отчаяние возможности"
-              subtitle="Координата Y > 60%"
+              title={t.axisSubtypes.despairOfPossibility}
+              subtitle={`${t.axisSubtypes.coordinateAbove} (Y)`}
               options={['combinatorial', 'paralyzed'] as PossibilitySubtype[]}
               value={axisSubtypes.possibilityType}
               onChange={(v) => setAxisSubtypes({ ...axisSubtypes, possibilityType: v as PossibilitySubtype | undefined })}
-              descriptions={ZONE_DESCRIPTIONS.possibility}
+              descriptions={descriptions.possibility}
+              subtypeNames={subtypeNames}
             />
           )}
 
           {/* Необходимость */}
           {suggestedAxes.showNecessity && (
             <AxisSubtypeSelector
-              title="Отчаяние необходимости"
-              subtitle="Координата Y < 40%"
+              title={t.axisSubtypes.despairOfNecessity}
+              subtitle={`${t.axisSubtypes.coordinateBelow} (Y)`}
               options={['fatalist', 'determinist'] as NecessitySubtype[]}
               value={axisSubtypes.necessityType}
               onChange={(v) => setAxisSubtypes({ ...axisSubtypes, necessityType: v as NecessitySubtype | undefined })}
-              descriptions={ZONE_DESCRIPTIONS.necessity}
+              descriptions={descriptions.necessity}
+              subtypeNames={subtypeNames}
             />
           )}
 
           {/* Неведение */}
           {suggestedAxes.showUnawareness && (
             <AxisSubtypeSelector
-              title="Неведение"
-              subtitle="Координата Z < 40%"
+              title={t.axisSubtypes.unawarenessTitle}
+              subtitle={`${t.axisSubtypes.coordinateBelow} (Z)`}
               options={['naive', 'busy', 'denial'] as UnawarenessSubtype[]}
               value={axisSubtypes.unawarenessType}
               onChange={(v) => setAxisSubtypes({ ...axisSubtypes, unawarenessType: v as UnawarenessSubtype | undefined })}
-              descriptions={ZONE_DESCRIPTIONS.unawareness}
+              descriptions={descriptions.unawareness}
+              subtypeNames={subtypeNames}
             />
           )}
 
           {/* Осознанность (но не для religious + high awareness = спасение) */}
           {suggestedAxes.showAwareness && !(stage === 'religious' && vector.consciousness > 0.6) && (
             <AxisSubtypeSelector
-              title="Осознанность"
-              subtitle="Координата Z > 60%"
+              title={t.axisSubtypes.awarenessTitle}
+              subtitle={`${t.axisSubtypes.coordinateAbove} (Z)`}
               options={['suffering', 'defiant'] as AwarenessSubtype[]}
               value={axisSubtypes.awarenessType}
               onChange={(v) => setAxisSubtypes({ ...axisSubtypes, awarenessType: v as AwarenessSubtype | undefined })}
-              descriptions={ZONE_DESCRIPTIONS.awareness}
+              descriptions={descriptions.awareness}
+              subtypeNames={subtypeNames}
             />
           )}
 
           {/* Точка спасения */}
           {stage === 'religious' && vector.consciousness > 0.6 && (
             <div className="p-3 bg-amber-900/20 border border-amber-700/50 rounded-lg">
-              <div className="text-sm text-amber-300 font-medium">🕊️ Точка спасения</div>
+              <div className="text-sm text-amber-300 font-medium">🕊️ {t.salvationPoint.title}</div>
               <div className="text-xs text-amber-400/70 mt-1">
-                Религиозная стадия с высокой осознанностью — это не отчаяние, а его преодоление
+                {t.salvationPoint.description}
               </div>
             </div>
           )}
@@ -372,7 +401,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       <div>
         <div className="flex items-center justify-between mb-1">
           <label className="text-sm font-medium text-slate-300">
-            Краткий лейбл
+            {t.points.shortLabel}
           </label>
           <button
             type="button"
@@ -386,11 +415,11 @@ export const PointEditor: React.FC<PointEditorProps> = ({
                 axisSubtypes,
                 label: '',
               };
-              setLabel(generateLabel(tempPoint));
+              setLabel(generateLabelLocalized(tempPoint, t));
             }}
             className="text-xs text-violet-400 hover:text-violet-300"
           >
-            Сгенерировать
+            {t.points.generate}
           </button>
         </div>
         <input
@@ -400,7 +429,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
             setLabel(e.target.value);
             setUseAutoLabel(false);
           }}
-          placeholder="Краткое описание состояния"
+          placeholder={t.points.labelPlaceholder}
           className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
           required
         />
@@ -410,7 +439,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
       <div>
         <div className="flex items-center justify-between mb-1">
           <label className="text-sm font-medium text-slate-300">
-            Детальное описание
+            {t.points.detailedDescription}
           </label>
           <button
             type="button"
@@ -424,11 +453,11 @@ export const PointEditor: React.FC<PointEditorProps> = ({
                 axisSubtypes,
                 label: '',
               };
-              setDescription(generateDescription(tempPoint));
+              setDescription(generateProceduralDescriptionLocalized(tempPoint, t, descriptions));
             }}
             className="text-xs text-violet-400 hover:text-violet-300"
           >
-            Сгенерировать
+            {t.points.generate}
           </button>
         </div>
         <textarea
@@ -437,7 +466,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
             setDescription(e.target.value);
             setUseAutoDescription(false);
           }}
-          placeholder="Пользовательское описание (опционально, процедурное сгенерируется автоматически)"
+          placeholder={t.points.descriptionPlaceholder}
           rows={6}
           className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
         />
@@ -449,7 +478,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
           type="submit"
           className="w-full py-2 px-4 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors"
         >
-          {isEditing ? 'Сохранить' : 'Создать точку'}
+          {isEditing ? t.points.save : t.points.create}
         </button>
         {isEditing && (
           <button
@@ -457,7 +486,7 @@ export const PointEditor: React.FC<PointEditorProps> = ({
             onClick={handleDelete}
             className="w-full py-2 px-4 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors"
           >
-            Удалить точку
+            {t.points.deletePoint}
           </button>
         )}
       </div>

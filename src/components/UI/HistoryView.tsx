@@ -1,7 +1,7 @@
 import type { Character } from '../../types';
 import { useStore } from '../../store/useStore';
+import { useT } from '../../store/useLanguageStore';
 import { buildHistoryTree, copyHistoryToPoint, flattenTreeWithDepth } from '../../utils/graphUtils';
-import { STAGE_NAMES, TRANSITION_NAMES } from '../../data/descriptions';
 import { COLORS } from '../../utils/colorUtils';
 
 interface HistoryViewProps {
@@ -9,10 +9,23 @@ interface HistoryViewProps {
 }
 
 export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
+  const t = useT();
   const selectPoint = useStore((state) => state.selectPoint);
   const openPointEditor = useStore((state) => state.openPointEditor);
   const openPathDetail = useStore((state) => state.openPathDetail);
   const selectedPointId = useStore((state) => state.selectedPointId);
+
+  const stageNames = {
+    aesthetic: t.stages.aesthetic,
+    ethical: t.stages.ethical,
+    religious: t.stages.religious,
+  };
+
+  const transitionNames = {
+    evolution: t.transitionTypes.evolution,
+    crisis: t.transitionTypes.crisis,
+    branch: t.transitionTypes.branch,
+  };
 
   const tree = buildHistoryTree(
     character.points,
@@ -46,8 +59,8 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
             d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
           />
         </svg>
-        <p className="text-sm">Нет точек траектории</p>
-        <p className="text-xs mt-1">Добавьте первую точку</p>
+        <p className="text-sm">{t.characters.noCharacters}</p>
+        <p className="text-xs mt-1">{t.points.addPoint}</p>
       </div>
     );
   }
@@ -55,7 +68,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
   // Ядро персонажа
   const CoreSection = () => (
     <div className="p-3 bg-slate-800/50 rounded-lg mb-4">
-      <h4 className="text-xs font-medium text-slate-400 mb-2">ЯДРО</h4>
+      <h4 className="text-xs font-medium text-slate-400 mb-2">{t.characterCore.history}</h4>
       {character.core.history.length > 0 && (
         <ul className="text-sm text-slate-300 space-y-1 mb-2">
           {character.core.history.map((h, i) => (
@@ -68,12 +81,12 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
       )}
       {character.core.body && (
         <div className="text-xs text-slate-400">
-          <span className="text-slate-500">Тело:</span> {character.core.body}
+          <span className="text-slate-500">{t.characterCore.body}:</span> {character.core.body}
         </div>
       )}
       {character.core.gift && (
         <div className="text-xs text-slate-400">
-          <span className="text-slate-500">Дар:</span> {character.core.gift}
+          <span className="text-slate-500">{t.characterCore.gift}:</span> {character.core.gift}
         </div>
       )}
     </div>
@@ -81,7 +94,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
 
   return (
     <div className="p-4">
-      <h3 className="text-sm font-medium text-slate-300 mb-3">История</h3>
+      <h3 className="text-sm font-medium text-slate-300 mb-3">{t.characterCore.history}</h3>
 
       {(character.core.history.length > 0 ||
         character.core.body ||
@@ -109,7 +122,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
                     className="text-[10px]"
                     style={{ color: COLORS.connections[connection.transitionType] }}
                   >
-                    {TRANSITION_NAMES[connection.transitionType]}
+                    {transitionNames[connection.transitionType]}
                   </span>
                   {connection.crisis?.trigger && (
                     <span className="text-[10px] text-slate-500">
@@ -146,7 +159,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
                         style={{ backgroundColor: stageColor }}
                       />
                       <span className="text-[10px] text-slate-400">
-                        {STAGE_NAMES[point.stage]}
+                        {stageNames[point.stage]}
                       </span>
                     </div>
                   </div>
@@ -159,7 +172,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
                         handleCopy(point.id);
                       }}
                       className="p-1 hover:bg-slate-600 rounded"
-                      title="Копировать историю до этой точки"
+                      title={t.characters.copyPrompt}
                     >
                       <svg
                         className="w-3.5 h-3.5 text-slate-400"
@@ -181,7 +194,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ character }) => {
                         openPointEditor(point.id);
                       }}
                       className="p-1 hover:bg-slate-600 rounded"
-                      title="Редактировать"
+                      title={t.actions.edit}
                     >
                       <svg
                         className="w-3.5 h-3.5 text-slate-400"

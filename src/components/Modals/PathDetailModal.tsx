@@ -1,70 +1,102 @@
 import { useState } from 'react';
 import { useStore, useSelectedCharacter } from '../../store/useStore';
-import { STAGE_NAMES, SUBTYPE_NAMES, TRANSITION_NAMES } from '../../data/descriptions';
-import { generateProceduralDescription } from '../../data/labels';
+import { useT, useDescriptions } from '../../store/useLanguageStore';
+import { generateProceduralDescriptionLocalized } from '../../data/labels';
 import { COLORS } from '../../utils/colorUtils';
 import { findPathFromRoot, findConnection } from '../../utils/graphUtils';
 import type { Character, DespairPoint } from '../../types';
+import type { TranslationStrings, TranslationDescriptions } from '../../i18n/types';
 
 /**
- * Описывает позицию на оси словами
+ * Generates localized LLM prompt with beat sheet synopsis and first-person phenomenology
  */
-function describeAxisPosition(value: number, lowLabel: string, highLabel: string): string {
-  if (value < 0.2) return `глубоко в ${lowLabel}`;
-  if (value < 0.4) return `склоняется к ${lowLabel}`;
-  if (value < 0.6) return `между ${lowLabel} и ${highLabel}`;
-  if (value < 0.8) return `склоняется к ${highLabel}`;
-  return `глубоко в ${highLabel}`;
-}
-
-/**
- * Генерирует промпт для LLM с beat sheet синопсисом и феноменологией от лица персонажа
- */
-function generateLLMPrompt(character: Character, path: DespairPoint[]): string {
+function generateLLMPromptLocalized(
+  character: Character,
+  path: DespairPoint[],
+  t: TranslationStrings,
+  descriptions: TranslationDescriptions
+): string {
   const lines: string[] = [];
 
-  // Заголовок
-  lines.push(`# Задание: Beat Sheet синопсис + Феноменология от лица персонажа`);
+  const stageNamesMap: Record<string, string> = {
+    aesthetic: t.stages.aesthetic,
+    ethical: t.stages.ethical,
+    religious: t.stages.religious,
+  };
+
+  const subtypeNamesMap: Record<string, string> = {
+    sensual: t.stageSubtypes.sensual,
+    romantic: t.stageSubtypes.romantic,
+    intellectual: t.stageSubtypes.intellectual,
+    civic: t.stageSubtypes.civic,
+    heroic: t.stageSubtypes.heroic,
+    immanent: t.stageSubtypes.immanent,
+    paradoxical: t.stageSubtypes.paradoxical,
+    imagination: t.axisSubtypes.imagination,
+    cognition: t.axisSubtypes.cognition,
+    feeling: t.axisSubtypes.feeling,
+    will: t.axisSubtypes.will,
+    conformist: t.axisSubtypes.conformist,
+    prudent: t.axisSubtypes.prudent,
+    combinatorial: t.axisSubtypes.combinatorial,
+    paralyzed: t.axisSubtypes.paralyzed,
+    fatalist: t.axisSubtypes.fatalist,
+    determinist: t.axisSubtypes.determinist,
+    naive: t.axisSubtypes.naive,
+    busy: t.axisSubtypes.busy,
+    denial: t.axisSubtypes.denial,
+    suffering: t.axisSubtypes.suffering,
+    defiant: t.axisSubtypes.defiant,
+  };
+
+  const transitionNamesMap: Record<string, string> = {
+    evolution: t.transitionTypes.evolution,
+    crisis: t.transitionTypes.crisis,
+    branch: t.transitionTypes.branch,
+  };
+
+  // Header
+  lines.push(`# ${t.appTitle}: Beat Sheet + First-Person Phenomenology`);
   lines.push(``);
-  lines.push(`Сгенерируй beat sheet синопсис траектории персонажа и одно развёрнутое переживание центрального события от первого лица ("Феноменология от лица персонажа").`);
+  lines.push(`Generate a beat sheet synopsis of the character's trajectory and one detailed first-person experience of the central event.`);
   lines.push(``);
 
-  // Персонаж
-  lines.push(`## Персонаж: ${character.name}`);
+  // Character
+  lines.push(`## Character: ${character.name}`);
   lines.push(``);
 
-  // Core — только если есть данные
+  // Core
   const hasCore = character.core.history.length > 0 || character.core.body || character.core.gift;
   if (hasCore) {
-    lines.push(`### Ядро персонажа`);
+    lines.push(`### ${t.characterCore.history}`);
     if (character.core.history.length > 0) {
-      lines.push(`- **Ключевые события прошлого:** ${character.core.history.join('; ')}`);
+      lines.push(`- **${t.characterCore.history}:** ${character.core.history.join('; ')}`);
     }
     if (character.core.body) {
-      lines.push(`- **Физическое описание:** ${character.core.body}`);
+      lines.push(`- **${t.characterCore.body}:** ${character.core.body}`);
     }
     if (character.core.gift) {
-      lines.push(`- **Талант/способность:** ${character.core.gift}`);
+      lines.push(`- **${t.characterCore.gift}:** ${character.core.gift}`);
     }
     lines.push(``);
   }
 
-  // Контекст модели Кьеркегора
-  lines.push(`### Контекст: Модель отчаяния Сёрена Кьеркегора`);
+  // Kierkegaard context
+  lines.push(`### Context: Kierkegaard's Model of Despair`);
   lines.push(``);
-  lines.push(`Пространство отчаяния имеет три оси (значения от 0% до 100%):`);
-  lines.push(`- **Конечное ↔ Бесконечное:** Конечное — потеря себя в мирском, приспособленчество. Бесконечное — потеря мира в себе, уход в фантазии и абстракции.`);
-  lines.push(`- **Необходимость ↔ Возможность:** Необходимость — детерминизм, фатализм. Возможность — паралич от избытка вариантов.`);
-  lines.push(`- **Неведение ↔ Осознанность:** Неведение — не знает о своём отчаянии. Осознанность — остро переживает своё состояние.`);
+  lines.push(`The space of despair has three axes (values from 0% to 100%):`);
+  lines.push(`- **${t.axes.finiteInfinite}:** ${t.axes.finite} — loss of self in the worldly. ${t.axes.infinite} — loss of world in self.`);
+  lines.push(`- **${t.axes.necessityPossibility}:** ${t.axes.necessity} — determinism, fatalism. ${t.axes.possibility} — paralysis from excess options.`);
+  lines.push(`- **${t.axes.unawareness} ↔ ${t.axes.awareness}:** ${t.axes.unawareness} — unaware of despair. ${t.axes.awareness} — acutely experiences their state.`);
   lines.push(``);
-  lines.push(`Стадии существования:`);
-  lines.push(`- **Эстетическая** — жизнь моментом, погоня за впечатлениями, избегание выбора`);
-  lines.push(`- **Этическая** — жизнь долгом, принятие ответственности, постоянство`);
-  lines.push(`- **Религиозная** — жизнь перед Богом, прыжок веры через абсурд`);
+  lines.push(`Stages of existence:`);
+  lines.push(`- **${t.stages.aesthetic}** — ${descriptions.stages.aesthetic.base.short}`);
+  lines.push(`- **${t.stages.ethical}** — ${descriptions.stages.ethical.base.short}`);
+  lines.push(`- **${t.stages.religious}** — ${descriptions.stages.religious.base.short}`);
   lines.push(``);
 
-  // Траектория
-  lines.push(`## Траектория персонажа (${path.length} ${path.length === 1 ? 'состояние' : path.length < 5 ? 'состояния' : 'состояний'})`);
+  // Trajectory
+  lines.push(`## Character Trajectory (${path.length} ${t.characters.points})`);
   lines.push(``);
 
   path.forEach((point, index) => {
@@ -76,55 +108,55 @@ function generateLLMPrompt(character: Character, path: DespairPoint[]): string {
 
     lines.push(`### ${index + 1}. ${point.label}`);
     if (point.momentName) {
-      lines.push(`**Момент в сюжете:** ${point.momentName}`);
+      lines.push(`**${t.points.momentName}:** ${point.momentName}`);
     }
     lines.push(``);
 
-    // Человеческое описание позиции в пространстве
-    lines.push(`**Положение в пространстве отчаяния:**`);
-    lines.push(`- ${describeAxisPosition(v.finiteInfinite, 'Конечном', 'Бесконечном')} (${Math.round(v.finiteInfinite * 100)}%)`);
-    lines.push(`- ${describeAxisPosition(v.necessityPossibility, 'Необходимости', 'Возможности')} (${Math.round(v.necessityPossibility * 100)}%)`);
-    lines.push(`- ${describeAxisPosition(v.consciousness, 'Неведении', 'Осознанности')} (${Math.round(v.consciousness * 100)}%)`);
+    // Position description
+    lines.push(`**${t.pointDetail.coordinates}:**`);
+    lines.push(`- ${t.axes.finiteInfinite}: ${Math.round(v.finiteInfinite * 100)}%`);
+    lines.push(`- ${t.axes.necessityPossibility}: ${Math.round(v.necessityPossibility * 100)}%`);
+    lines.push(`- ${t.axes.consciousness}: ${Math.round(v.consciousness * 100)}%`);
 
-    // Стадия с подтипом
-    const stageName = STAGE_NAMES[point.stage];
-    const subtypeName = point.stageSubtype ? SUBTYPE_NAMES[point.stageSubtype] : null;
-    lines.push(`**Стадия существования:** ${stageName}${subtypeName ? ` (${subtypeName})` : ''}`);
+    // Stage with subtype
+    const stageName = stageNamesMap[point.stage];
+    const subtypeName = point.stageSubtype ? subtypeNamesMap[point.stageSubtype] : null;
+    lines.push(`**${t.stages.title}:** ${stageName}${subtypeName ? ` (${subtypeName})` : ''}`);
 
-    // Подтипы осей если заданы — с человеческими названиями
+    // Axis subtypes
     if (point.axisSubtypes) {
       const subtypes: string[] = [];
       if (point.axisSubtypes.infinityType) {
-        subtypes.push(`Бесконечное: ${SUBTYPE_NAMES[point.axisSubtypes.infinityType]}`);
+        subtypes.push(`${t.axes.infinite}: ${subtypeNamesMap[point.axisSubtypes.infinityType]}`);
       }
       if (point.axisSubtypes.finitudeType) {
-        subtypes.push(`Конечное: ${SUBTYPE_NAMES[point.axisSubtypes.finitudeType]}`);
+        subtypes.push(`${t.axes.finite}: ${subtypeNamesMap[point.axisSubtypes.finitudeType]}`);
       }
       if (point.axisSubtypes.possibilityType) {
-        subtypes.push(`Возможность: ${SUBTYPE_NAMES[point.axisSubtypes.possibilityType]}`);
+        subtypes.push(`${t.axes.possibility}: ${subtypeNamesMap[point.axisSubtypes.possibilityType]}`);
       }
       if (point.axisSubtypes.necessityType) {
-        subtypes.push(`Необходимость: ${SUBTYPE_NAMES[point.axisSubtypes.necessityType]}`);
+        subtypes.push(`${t.axes.necessity}: ${subtypeNamesMap[point.axisSubtypes.necessityType]}`);
       }
       if (point.axisSubtypes.awarenessType) {
-        subtypes.push(`Осознанность: ${SUBTYPE_NAMES[point.axisSubtypes.awarenessType]}`);
+        subtypes.push(`${t.axes.awareness}: ${subtypeNamesMap[point.axisSubtypes.awarenessType]}`);
       }
       if (point.axisSubtypes.unawarenessType) {
-        subtypes.push(`Неведение: ${SUBTYPE_NAMES[point.axisSubtypes.unawarenessType]}`);
+        subtypes.push(`${t.axes.unawareness}: ${subtypeNamesMap[point.axisSubtypes.unawarenessType]}`);
       }
       if (subtypes.length > 0) {
-        lines.push(`**Характер состояния:** ${subtypes.join('; ')}`);
+        lines.push(`**State:** ${subtypes.join('; ')}`);
       }
     }
 
     if (point.description) {
-      lines.push(`**Авторское описание:** ${point.description}`);
+      lines.push(`**Description:** ${point.description}`);
     }
 
-    // Связь к следующей точке
+    // Connection to next point
     if (conn) {
       lines.push(``);
-      const transitionName = TRANSITION_NAMES[conn.transitionType];
+      const transitionName = transitionNamesMap[conn.transitionType];
       if (conn.transitionType === 'crisis') {
         let crisisLine = `↓ **${transitionName}**`;
         if (conn.crisis?.trigger) {
@@ -132,37 +164,61 @@ function generateLLMPrompt(character: Character, path: DespairPoint[]): string {
         }
         lines.push(crisisLine);
         if (conn.crisis?.alternatives && conn.crisis.alternatives.length > 0) {
-          lines.push(`  _Альтернативные пути: ${conn.crisis.alternatives.join(', ')}_`);
+          lines.push(`  _${t.connections.alternatives}: ${conn.crisis.alternatives.join(', ')}_`);
         }
       } else if (conn.transitionType === 'branch') {
-        lines.push(`↓ **${transitionName}** (альтернативное развитие)`);
+        lines.push(`↓ **${transitionName}**`);
       } else {
-        lines.push(`↓ **${transitionName}** (постепенное изменение)`);
+        lines.push(`↓ **${transitionName}**`);
       }
     }
 
     lines.push(``);
   });
 
-  // Инструкция
+  // Instructions
   lines.push(`---`);
-  lines.push(`## Что нужно сгенерировать:`);
+  lines.push(`## What to generate:`);
   lines.push(``);
-  lines.push(`### 1. Beat Sheet синопсис`);
-  lines.push(`Структурированное описание ключевых битов траектории: завязка, нарастание, кульминация, развязка. Опирайся на положение персонажа в пространстве отчаяния и переходы между состояниями.`);
+  lines.push(`### 1. Beat Sheet Synopsis`);
+  lines.push(`Structured description of the key beats of the trajectory: setup, rising action, climax, resolution. Base it on the character's position in the despair space and transitions between states.`);
   lines.push(``);
-  lines.push(`### 2. Феноменология от лица персонажа`);
-  lines.push(`Одно развёрнутое переживание центрального события от первого лица. Это должен быть внутренний монолог: что персонаж чувствует, как воспринимает мир, какие телесные ощущения испытывает. Передай его уникальный способ быть в мире, исходя из его положения на осях отчаяния.`);
+  lines.push(`### 2. First-Person Phenomenology`);
+  lines.push(`One detailed experience of the central event from the first person. This should be an inner monologue: what the character feels, how they perceive the world, what bodily sensations they experience. Convey their unique way of being in the world, based on their position on the despair axes.`);
 
   return lines.join('\n');
 }
 
 export const PathDetailModal: React.FC = () => {
+  const t = useT();
+  const descriptions = useDescriptions();
   const closePathDetail = useStore((state) => state.closePathDetail);
   const pathDetailPointId = useStore((state) => state.pathDetailPointId);
   const openConnectionEditor = useStore((state) => state.openConnectionEditor);
   const character = useSelectedCharacter();
   const [copied, setCopied] = useState(false);
+
+  const stageNames = {
+    aesthetic: t.stages.aesthetic,
+    ethical: t.stages.ethical,
+    religious: t.stages.religious,
+  };
+
+  const subtypeNames: Record<string, string> = {
+    sensual: t.stageSubtypes.sensual,
+    romantic: t.stageSubtypes.romantic,
+    intellectual: t.stageSubtypes.intellectual,
+    civic: t.stageSubtypes.civic,
+    heroic: t.stageSubtypes.heroic,
+    immanent: t.stageSubtypes.immanent,
+    paradoxical: t.stageSubtypes.paradoxical,
+  };
+
+  const transitionNames = {
+    evolution: t.transitionTypes.evolution,
+    crisis: t.transitionTypes.crisis,
+    branch: t.transitionTypes.branch,
+  };
 
   if (!character || !pathDetailPointId) return null;
 
@@ -189,10 +245,10 @@ export const PathDetailModal: React.FC = () => {
           <div className="flex items-start justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white">
-                Путь к точке
+                {t.pathDetail.title}
               </h2>
               <div className="text-sm text-slate-400 mt-1">
-                {character.name} · {path.length} {path.length === 1 ? 'точка' : path.length < 5 ? 'точки' : 'точек'}
+                {character.name} · {path.length} {t.characters.points}
               </div>
             </div>
             <button
@@ -254,10 +310,10 @@ export const PathDetailModal: React.FC = () => {
                           style={{ backgroundColor: stageColor }}
                         />
                         <span className="text-sm text-slate-400">
-                          {STAGE_NAMES[point.stage]}
+                          {stageNames[point.stage]}
                           {point.stageSubtype && (
                             <span className="text-slate-500">
-                              {' · '}{SUBTYPE_NAMES[point.stageSubtype]}
+                              {' · '}{subtypeNames[point.stageSubtype]}
                             </span>
                           )}
                         </span>
@@ -274,7 +330,7 @@ export const PathDetailModal: React.FC = () => {
                   {point.description && (
                     <div className="mb-3">
                       <div className="text-xs font-medium text-violet-400 mb-1">
-                        Описание автора
+                        {t.pathDetail.authorDescription}
                       </div>
                       <div className="text-sm text-slate-300 whitespace-pre-wrap bg-slate-700/50 p-2 rounded border-l-2 border-violet-500">
                         {point.description}
@@ -285,10 +341,10 @@ export const PathDetailModal: React.FC = () => {
                   {/* Процедурное описание */}
                   <div>
                     <div className="text-xs font-medium text-slate-500 mb-1">
-                      Анализ состояния
+                      {t.pathDetail.stateAnalysis}
                     </div>
                     <div className="text-sm text-slate-400 whitespace-pre-wrap">
-                      {generateProceduralDescription(point)}
+                      {generateProceduralDescriptionLocalized(point, t, descriptions)}
                     </div>
                   </div>
                 </div>
@@ -315,7 +371,7 @@ export const PathDetailModal: React.FC = () => {
                             ? '#fb923c'
                             : '#94a3b8',
                       }}
-                      title="Редактировать связь"
+                      title={t.connections.editConnection}
                     >
                       <svg
                         className="w-3 h-3"
@@ -330,7 +386,7 @@ export const PathDetailModal: React.FC = () => {
                           d="M19 14l-7 7m0 0l-7-7m7 7V3"
                         />
                       </svg>
-                      {TRANSITION_NAMES[connection.transitionType]}
+                      {transitionNames[connection.transitionType]}
                       {connection.crisis?.trigger && (
                         <span className="text-slate-500 ml-1">
                           — {connection.crisis.trigger}
@@ -362,7 +418,7 @@ export const PathDetailModal: React.FC = () => {
         <div className="p-4 border-t border-slate-700 flex gap-3">
           <button
             onClick={() => {
-              const prompt = generateLLMPrompt(character, path);
+              const prompt = generateLLMPromptLocalized(character, path, t, descriptions);
               navigator.clipboard.writeText(prompt).then(() => {
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
@@ -375,14 +431,14 @@ export const PathDetailModal: React.FC = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                Скопировано
+                {t.characters.promptCopied}
               </>
             ) : (
               <>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
                 </svg>
-                Копировать промпт
+                {t.characters.copyPrompt}
               </>
             )}
           </button>
@@ -390,7 +446,7 @@ export const PathDetailModal: React.FC = () => {
             onClick={closePathDetail}
             className="flex-1 py-2 px-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
           >
-            Закрыть
+            {t.actions.close}
           </button>
         </div>
       </div>

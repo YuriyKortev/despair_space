@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import type { DespairVector } from '../../types';
 import { COLORS } from '../../utils/colorUtils';
+import { useT } from '../../store/useLanguageStore';
 
 interface VectorSlidersProps {
   vector: DespairVector;
@@ -20,45 +21,6 @@ interface SliderConfig {
     highExample: string;
   };
 }
-
-const sliderConfigs: SliderConfig[] = [
-  {
-    key: 'finiteInfinite',
-    label: 'Конечное ↔ Бесконечное',
-    startLabel: 'Конечное',
-    endLabel: 'Бесконечное',
-    color: COLORS.axes.finiteInfinite,
-    tooltip: {
-      description: 'Ось самости: потеря себя в мире vs потеря мира в себе',
-      lowExample: 'Низко (конечное): конформизм, растворение в социуме, «как все», узкое благоразумие',
-      highExample: 'Высоко (бесконечное): фантазии, абстрактные идеалы, грандиозные планы без реализации',
-    },
-  },
-  {
-    key: 'necessityPossibility',
-    label: 'Необходимость ↔ Возможность',
-    startLabel: 'Необходимость',
-    endLabel: 'Возможность',
-    color: COLORS.axes.necessityPossibility,
-    tooltip: {
-      description: 'Ось свободы: детерминизм vs паралич выбора',
-      lowExample: 'Низко (необходимость): фатализм, «всё предопределено», подчинение обстоятельствам',
-      highExample: 'Высоко (возможность): бесконечный перебор вариантов, неспособность выбрать, паралич',
-    },
-  },
-  {
-    key: 'consciousness',
-    label: 'Неведение ↔ Осознанность',
-    startLabel: 'Неведение',
-    endLabel: 'Осознанность',
-    color: COLORS.axes.consciousness,
-    tooltip: {
-      description: 'Ось глубины: понимание своего экзистенциального состояния',
-      lowExample: 'Низко (неведение): не знает о своём отчаянии, наивность, бегство в занятость',
-      highExample: 'Высоко (осознанность): видит своё отчаяние, страдание или демоническое упрямство',
-    },
-  },
-];
 
 // Компонент тултипа с вопросиком (рендерится через портал)
 const AxisTooltip: React.FC<{
@@ -139,6 +101,47 @@ export const VectorSliders: React.FC<VectorSlidersProps> = ({
   vector,
   onChange,
 }) => {
+  const t = useT();
+
+  const sliderConfigs = useMemo<SliderConfig[]>(() => [
+    {
+      key: 'finiteInfinite',
+      label: t.axes.finiteInfinite,
+      startLabel: t.axes.finite,
+      endLabel: t.axes.infinite,
+      color: COLORS.axes.finiteInfinite,
+      tooltip: {
+        description: t.axes.finiteInfinite,
+        lowExample: `${t.axes.finite}: ${t.axisSubtypes.conformist}, ${t.axisSubtypes.prudent}`,
+        highExample: `${t.axes.infinite}: ${t.axisSubtypes.imagination}, ${t.axisSubtypes.will}`,
+      },
+    },
+    {
+      key: 'necessityPossibility',
+      label: t.axes.necessityPossibility,
+      startLabel: t.axes.necessity,
+      endLabel: t.axes.possibility,
+      color: COLORS.axes.necessityPossibility,
+      tooltip: {
+        description: t.axes.necessityPossibility,
+        lowExample: `${t.axes.necessity}: ${t.axisSubtypes.fatalist}, ${t.axisSubtypes.determinist}`,
+        highExample: `${t.axes.possibility}: ${t.axisSubtypes.combinatorial}, ${t.axisSubtypes.paralyzed}`,
+      },
+    },
+    {
+      key: 'consciousness',
+      label: `${t.axes.unawareness} ↔ ${t.axes.awareness}`,
+      startLabel: t.axes.unawareness,
+      endLabel: t.axes.awareness,
+      color: COLORS.axes.consciousness,
+      tooltip: {
+        description: t.axes.consciousness,
+        lowExample: `${t.axes.unawareness}: ${t.axisSubtypes.naive}, ${t.axisSubtypes.busy}, ${t.axisSubtypes.denial}`,
+        highExample: `${t.axes.awareness}: ${t.axisSubtypes.suffering}, ${t.axisSubtypes.defiant}`,
+      },
+    },
+  ], [t]);
+
   const handleChange = (key: keyof DespairVector, value: number) => {
     onChange({ ...vector, [key]: value });
   };
@@ -188,7 +191,7 @@ export const VectorSliders: React.FC<VectorSlidersProps> = ({
           <div className="text-xs text-center mt-1" style={{ color: config.color }}>
             {vector[config.key] < 0.4 && config.startLabel}
             {vector[config.key] > 0.6 && config.endLabel}
-            {vector[config.key] >= 0.4 && vector[config.key] <= 0.6 && 'Баланс'}
+            {vector[config.key] >= 0.4 && vector[config.key] <= 0.6 && t.axes.balance}
           </div>
         </div>
       ))}

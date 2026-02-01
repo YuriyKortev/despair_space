@@ -4,9 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="added hide character button">
+    <list default="true" id="ef51d8a4-730f-4d8b-97d9-09f577cb77ab" name="Changes" comment="Updated PathDetailModal for improved trajectory and axis descriptions.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Layout/DetailPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/DetailPanel.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Layout/MainLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/MainLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Layout/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Layout/Sidebar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/Modals/PathDetailModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Modals/PathDetailModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Modals/PointDetailModal.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Modals/PointDetailModal.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Scene3D/Axes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Scene3D/Axes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/CharacterCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/CharacterCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/CharacterEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/CharacterEditor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/CharacterList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/CharacterList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/HistoryView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/HistoryView.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/PointEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/PointEditor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/StageSelector.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/StageSelector.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/UI/VectorSliders.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/UI/VectorSliders.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data/labels.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/data/labels.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +32,8 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="5" />
+    <option name="cachedIndexableFilesCount" value="12817" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -28,28 +42,28 @@
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="392e21O1mQkYQ4WpHyyGQcM1KHg" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/79819/PycharmProjects/despair_space",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/79819/PycharmProjects/despair_space&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\79819\PycharmProjects\despair_space" />
@@ -118,7 +132,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769911808031</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Updated PathDetailModal for improved trajectory and axis descriptions.">
+      <option name="closed" value="true" />
+      <created>1769951601587</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1769951601587</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -127,7 +149,8 @@
     <MESSAGE value="Refine auto-generation logic in PointEditor&#10;&#10;- Disable auto-generated labels and descriptions when editing existing points.&#10;- Ensure initialization flags handle editing state correctly.&#10;- Preserve user-modified descriptions, discarding auto-generated ones." />
     <MESSAGE value="added copy prompt buttn" />
     <MESSAGE value="added hide character button" />
-    <option name="LAST_COMMIT_MESSAGE" value="added hide character button" />
+    <MESSAGE value="Updated PathDetailModal for improved trajectory and axis descriptions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated PathDetailModal for improved trajectory and axis descriptions." />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
