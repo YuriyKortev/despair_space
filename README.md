@@ -1,5 +1,7 @@
 # Despair Space
 
+**[Live Demo](https://YuriyKortev.github.io/despair_space/)**
+
 A 3D visualization tool for mapping fictional characters' psychological states using Kierkegaard's philosophical model of despair.
 
 ![Screenshot placeholder](docs/images/main-screenshot.png)
