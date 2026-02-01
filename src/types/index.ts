@@ -140,6 +140,7 @@ export interface AppState {
   characters: Character[];
   selectedCharacterId: string | null;
   selectedPointId: string | null;
+  hiddenCharacterIds: string[];
 
   // UI состояние
   viewMode: ViewMode;
@@ -182,6 +183,7 @@ export interface AppActions {
   setAddingPoint: (value: boolean) => void;
   startConnecting: (fromPointId: string) => void;
   cancelConnecting: () => void;
+  toggleCharacterVisibility: (id: string) => void;
 
   // Модалки
   openPointDetail: (pointId: string) => void;

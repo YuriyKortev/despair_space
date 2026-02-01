@@ -10,6 +10,7 @@ interface ConnectionProps {
   connection: ConnectionType;
   fromPoint: DespairPoint;
   toPoint: DespairPoint;
+  characterId: string;
   isCharacterSelected: boolean;
 }
 
@@ -17,8 +18,11 @@ export const Connection: React.FC<ConnectionProps> = ({
   connection,
   fromPoint,
   toPoint,
+  characterId,
   isCharacterSelected,
 }) => {
+  const selectedCharacterId = useStore((state) => state.selectedCharacterId);
+  const selectCharacter = useStore((state) => state.selectCharacter);
   const openConnectionEditor = useStore((state) => state.openConnectionEditor);
 
   const color = getConnectionColor(connection.transitionType);
@@ -76,9 +80,12 @@ export const Connection: React.FC<ConnectionProps> = ({
   // Обработчик клика для редактирования связи
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    if (isCharacterSelected) {
-      openConnectionEditor(connection.id);
+    // Если кликнули на связь другого персонажа — сначала переключаемся на него
+    if (selectedCharacterId !== characterId) {
+      selectCharacter(characterId);
+      return;
     }
+    openConnectionEditor(connection.id);
   };
 
   return (

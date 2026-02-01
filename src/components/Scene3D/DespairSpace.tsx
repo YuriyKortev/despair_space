@@ -8,6 +8,11 @@ import { COLORS } from '../../utils/colorUtils';
 const Scene: React.FC = () => {
   const characters = useStore((state) => state.characters);
   const selectedCharacterId = useStore((state) => state.selectedCharacterId);
+  const hiddenCharacterIds = useStore((state) => state.hiddenCharacterIds);
+
+  const visibleCharacters = characters.filter(
+    (c) => !hiddenCharacterIds.includes(c.id)
+  );
 
   return (
     <>
@@ -20,7 +25,7 @@ const Scene: React.FC = () => {
       <Axes />
 
       {/* Траектории персонажей */}
-      {characters.map((character) => (
+      {visibleCharacters.map((character) => (
         <CharacterTrajectory
           key={character.id}
           character={character}

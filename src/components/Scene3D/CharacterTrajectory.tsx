@@ -29,6 +29,7 @@ export const CharacterTrajectory: React.FC<CharacterTrajectoryProps> = ({
             connection={connection}
             fromPoint={fromPoint}
             toPoint={toPoint}
+            characterId={character.id}
             isCharacterSelected={isSelected}
           />
         );

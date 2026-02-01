@@ -74,6 +74,7 @@ const initialState = {
   characters: [],
   selectedCharacterId: null,
   selectedPointId: null,
+  hiddenCharacterIds: [] as string[],
   viewMode: '3d' as ViewMode,
   isAddingPoint: false,
   isConnecting: false,
@@ -282,6 +283,14 @@ export const useStore = create<Store>()(
           isConnecting: false,
           connectFromPointId: null,
         });
+      },
+
+      toggleCharacterVisibility: (id) => {
+        set((state) => ({
+          hiddenCharacterIds: state.hiddenCharacterIds.includes(id)
+            ? state.hiddenCharacterIds.filter((cid) => cid !== id)
+            : [...state.hiddenCharacterIds, id],
+        }));
       },
 
       // ===== МОДАЛКИ =====

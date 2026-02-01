@@ -24,8 +24,10 @@ export const DespairPoint: React.FC<DespairPointProps> = ({
   const meshRef = useRef<THREE.Mesh>(null);
 
   const selectedPointId = useStore((state) => state.selectedPointId);
+  const selectedCharacterId = useStore((state) => state.selectedCharacterId);
   const isConnecting = useStore((state) => state.isConnecting);
   const connectFromPointId = useStore((state) => state.connectFromPointId);
+  const selectCharacter = useStore((state) => state.selectCharacter);
   const selectPoint = useStore((state) => state.selectPoint);
   const openPointDetail = useStore((state) => state.openPointDetail);
   const connectPoints = useStore((state) => state.connectPoints);
@@ -67,6 +69,13 @@ export const DespairPoint: React.FC<DespairPointProps> = ({
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
 
+    // Если кликнули на точку другого персонажа — сначала переключаемся на него
+    if (selectedCharacterId !== characterId) {
+      selectCharacter(characterId);
+      selectPoint(point.id);
+      return;
+    }
+
     if (isConnecting && connectFromPointId && connectFromPointId !== point.id) {
       // Завершаем соединение
       connectPoints(characterId, connectFromPointId, point.id, 'evolution');
@@ -81,6 +90,10 @@ export const DespairPoint: React.FC<DespairPointProps> = ({
 
   const handleDoubleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
+    // Если это точка другого персонажа — сначала переключаемся
+    if (selectedCharacterId !== characterId) {
+      selectCharacter(characterId);
+    }
     openPointDetail(point.id);
   };
 
